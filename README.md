@@ -1,4 +1,14 @@
 # bogged-again
+Third commit:
+Did some overhauls on the headline ranking system- it'll attempt to get headlines that have the stock ticker/company name in them as the first one. Also added a rudimentary match percent for the articles- it doesn't work well and I'll probably need to try out that natural language processing thing.
+
+Current Issues:
+TheStreet doesn't actually have news on all the stocks, as I found out when I tried to test Pearson(PSO) with the script. I might need to change my news source to something more spread out, like Google or something- but at the same time I'd rather the news come from the same source. I need to think about this more. And as mentioned before, the match percent for the news needs more work.
+
+Next build:
+I've been trying to learn Django and I finally got through the tutorial- I'll probably change the script so that it becomes a pluggable app, but I wanted to at least make a commit before I do that.
+
+-------------------------------------------------------------------------------------------------------
 Second Commit:
 Now it actually browses the web! It will now pull any headlines it deems likely from a website called the street, and saves it along with the previously extracted data. Code has also been commented better.
 

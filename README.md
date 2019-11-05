@@ -1,4 +1,14 @@
 # bogged-again
+Fourth commit:
+Now with machine learning! I started using this module called NLTK that works on natural language processing to attempt to classify the article type, based off features in classifier.py(I split the news into some rudimentary types such as Lowered Guidance(LG), Regulations(R), Revenue Miss(RM), etc). Once California stops being on fire and AWS works well again, I'll describe all the changes in a blog post(boggedaga.in currently is running an apache server that runs the script in a Django framework, so it no longer directs to the godaddy website you all know and love, and HTML is not my forte). The classifier currently doesn't work well since my training set is very small(I have to label them manually), but I made it do some preeliminary classification, then copy the news text into a folder, where I will label them later- so kind of a growing training set. Also fixed the 401 Http error- yqd.py will now generate a new crumb upon the 401 exception. On that note, also added handling for 404 errors- you can see if you try inputting an unknown ticker into boggedaga.in.
+
+Current Issues:
+Still looking for a better source of news than the street- I would try google news, but there's some html shenanigans where it only loads more news if you scroll down, and I don't know how well python could handle that. 
+
+Next build:
+I have most of the info I need now, so the updates will likely be for the Django templates(right now it's pretty barebones, but maybe I'll pick up html to make it prettier). I might include the news urls as another column in the output, just so I can make hyperlinks for the headlines so the users can judge for themselves what the category is. I may update the classifier as well depending on the news I see.
+
+-------------------------------------------------------------------------------------------------------
 Third commit:
 Did some overhauls on the headline ranking system- it'll attempt to get headlines that have the stock ticker/company name in them as the first one. Also added a rudimentary match percent for the articles- it doesn't work well and I'll probably need to try out that natural language processing thing.
 

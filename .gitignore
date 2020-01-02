@@ -4,6 +4,8 @@
 __pycache__/
 blog/migrations/
 media/
+!media/image/
+!media/images/bogheader.png
 news/
 polls/boggedagain/stocks/
 stocks/

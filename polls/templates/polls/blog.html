@@ -1,0 +1,60 @@
+<head>
+<title> Bogged Again! </title>
+</head>
+
+{% load static %}
+<link rel="stylesheet" href={% static "w3.css" %}>
+<header class="w3-container w3-red">
+  <h1>Blogged Again</h1>
+</header>
+<div class="w3-sidebar w3-bar-block" style="width:15%">
+  <a href=http://www.boggedaga.in class="w3-bar-item w3-button">Home</a>
+  <a href=http://www.boggedaga.in/entrance class="w3-bar-item w3-button">The Bogchives</a>
+  <a href=http://www.boggedaga.in/dailybog class="w3-bar-item w3-button">The Daily Bog</a>
+        <a href=http://www.boggedaga.in/blog class="w3-bar-item w3-button">Blogged again</a>
+    <img src={% static "bogsidebar.png" %} alt="Header">
+</div>
+
+<div class="w3-container" style="margin-left:15%">
+<center>
+    <header class="w3-container w3-gray">
+  <h1>Devlog #6</h1>
+</header>
+<p>The server error log showed that someone attempted to google the blog(but was led to the cached version of the
+    <a href="https://boggedagain.godaddysites.com/blog?blog=y">old godaddy site<a>, which naturally doesn't exist
+        yet on the new site. Whoever the mystery patron is(I'm guessing a certain Scott), rejoice because I've put in a
+        placeholder blog entry here. So, big changes abound: </p>
+    <p>The website now has a proper style sheet, and it has started to archive data. I had some random number I
+        decided to call a ranking: it's something like (mean+median)*(1-1/samplesize)*positive percent.
+        I think the ranking needs work(really I would just recommend any stock that had a positive median
+    and a relatively high percentage of positive returns), but you can judge the effectiveness from the archive
+        (we should have 3 day results by thursday morning). There's also another stat in the archive that shows what happens if you
+    diversify and buy all the stocks listed evenly(the stocks with a ranking greater of 0 are shown).</p>
+    <p>There's still a fair bit that remains to be done though- for starters, I'm actually typing this all out in the template
+    for the blog page, which is wrong, immoral, unethical, whatever name you want to call it. Ideally there would be some
+    admin interface where I can actually make blog entries(I do know Django has some kind of function for that). The
+    next thing is the classifier- I've been lazy and haven't developed it at all.</p>
+    <p>I guess now time for some personal stuff? I'm still developing as you can see, but unemployment is pretty slow-
+        I do wonder what I'm lacking. A lot of listings seem to mention Scala, so maybe that's the next thing I'll try to learn.
+        I actually unironically used some sqlite to help generate the archive and the daily stats, although I don't really
+        know if it's faster than just writing results to a csv. Maybe? I was asked to do a phone interview, which I initially tried to schedule asap, but
+    backed off 2 weeks when I read about the contents of the interview, which involves live coding and questions about data structures/algorithms, which
+    I don't have a formal education in. I think the big divide between the comp sci majors and the rest of us is that I personally don't care
+    how exactly the code works or where it's from, since it might take 4 hours to write a new solution vs 30 minutes
+    adapting a solution some guy wrote on the internet, but apparently developers take offense to copied code, and require that you know everything from scratch?
+    I'm sure I'm simplifying the argument on both sides and people will get offended by this, but good thing this page doesn't have a
+        comment section yet(I'll work on it eventually).</p>
+    <p>11/06-11/11: RARE(37.71->37.99),+0.7%</p>
+    <p>11/13-11/18: GOOS(34.93->35.73),+2.29%</p>
+    <p>11/22- : ODP(2.25->2.27 ), +0.89% right now</p>
+    <p> You may notice that my trading decreased in frequency, partially out of cowardice and partially because the news
+    search engine just isn't giving me news for some days- that's another thing to work on. It gave me the motivation to provide
+     some of the simpler statistics like mean and median, which will at least tell me if I have a good shot if I bought in randomly.
+    The ultimate goal is still to have a classifier that works and a ranking that works off the same category mean/median, but for now
+    this will have to do. I personally don't believe in diversifying(because all the big shot experts recommend it,
+        and if they really were experts they wouldn't be talking about it), but maybe there's some truth to it over many trades. Either way the archive will show everything.</p>
+    <p> PS: Apparently after the domain change, the <a href="https://boggedagain.godaddysites.com/blog/f/devlog-50"> 5th
+        </a>(technically 6th, but I called it Devlog 5) doesn't show up on the GoDaddy blog list any more. The link is there if any of you wish to read my thoughts.</p>
+    <p> DQ</p>
+</center>
+</div>

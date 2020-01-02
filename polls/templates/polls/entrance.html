@@ -1,0 +1,72 @@
+<head>
+<title> The Bogchives </title>
+</head>
+{% load static %}
+<link rel="stylesheet" href={% static "w3.css" %}>
+<header class="w3-container w3-gray">
+  <h1>The Bogchives</h1>
+</header>
+<div class="w3-sidebar w3-bar-block" style="width:15%">
+  <a href=http://www.boggedaga.in class="w3-bar-item w3-button">Home</a>
+  <a href=http://www.boggedaga.in/entrance class="w3-bar-item w3-button">The Bogchives</a>
+  <a href=http://www.boggedaga.in/dailybog class="w3-bar-item w3-button">The Daily Bog</a>
+    <a href=http://www.boggedaga.in/blog class="w3-bar-item w3-button">Blogged again</a>
+        <img src={% static "bogsidebar.png" %} alt="Header" class="w3-grayscale-max">
+</div>
+
+<div class="w3-container" style="margin-left:15%">
+<center>
+Here's the entrance to the archives of this website's past stock records.
+    Enter a date in the format of "YYYY-MM-DD" below, and you can see how well/badly my trade philosophy works out.
+To give you some idea of what date to try, the oldest date we have is
+    <a href="http://www.boggedaga.in/bogchives/?date={{mindate}}">{{mindate}}</a>, while the latest date we have is
+    <a href="http://www.boggedaga.in/bogchives/?date={{maxdate}}">{{maxdate}}</a>.</p>
+<form action='/bogchives/'>
+    <textarea name="date" cols=10 rows=2></textarea>
+    <input type="submit" value="Submit">
+</form>
+</center>
+</div>
+<div class="w3-container" style="margin-left:15%">
+<center>
+<p> Recent performance: </p>
+<table border="1" class="sortable w3-table w3-bordered w3-striped">
+    <tr>
+    {% for item in headers %}
+        <th>{{item}}</th>
+    {% endfor %}
+    </tr>
+    {% for item in results %}
+        {% for thing in item %}
+            {% cycle '<tr>' '' '' '' %}
+                <center>
+                    {% if thing|length > 3 %}
+                    <td><a href="http://www.boggedaga.in/bogchives/?date={{thing}}"> {{thing}}</a></td>
+                    {% elif thing > 0 %}
+                    <td class="w3-green">{{thing}}</td>
+                    {% else %}
+                    <td class="w3-red">{{thing}}</td>
+                    {% endif %}
+                </center>
+            {% cycle '' '' '' '</tr>' %}
+        {% endfor %}
+    {% endfor %}
+</table>
+
+    <p> Average performance: </p>
+<table border="1" class="sortable w3-table w3-bordered w3-striped">
+    <tr>
+        <th>All Stocks</th>
+        <th>Top 10</th>
+        <th>Rank 1k+</th>
+    </tr>
+
+        <center>
+            <td>{{performance.all}}</td>
+            <td>{{performance.top10}}</td>
+            <td>{{performance.rank1k}}</td>
+        </center>
+
+</table>
+</center>
+</div>

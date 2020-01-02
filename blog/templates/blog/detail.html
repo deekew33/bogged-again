@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+  <head>
+    <title> {{ blog.title }}</title>
+  </head>
+{% load static %}
+<link rel="stylesheet" href={% static "w3.css" %}>
+<header class="w3-container w3-red">
+  <h1>Blogged Again</h1>
+</header>
+<div class="w3-sidebar w3-bar-block" style="width:15%">
+  <a href=http://www.boggedaga.in class="w3-bar-item w3-button">Home</a>
+  <a href=http://www.boggedaga.in/entrance class="w3-bar-item w3-button">The Bogchives</a>
+  <a href=http://www.boggedaga.in/dailybog class="w3-bar-item w3-button">The Daily Bog</a>
+        <a href=http://www.boggedaga.in/blog class="w3-bar-item w3-button">Blogged again</a>
+    <img src={% static "bogsidebar.png" %} alt="Header">
+</div>
+
+<div class="w3-container" style="margin-left:15%">
+  <head>
+    <title> {{ blog.title }}</title>
+  </head>
+<body>
+      <h1> {{ blog.title }}</h1>
+          <p>{{ blog.pub_date }}</p>
+      <hr />
+      <br />
+      <center>
+      	<img src = "{{ blog.image.url }}"  height=”300” width=”400”/>
+      </center>
+<br />
+      <br/>
+      <p>{{ blog.body }}</p>
+      &copy; Bogged Again,  {% now "Y" %}
+  </body>
+</div>
+
+
+  <div class="w3-container" style="margin-left:15%">
+	<body>
+      		<br /> <br />
+     		 <h2>Comments</h2>
+     		 <hr/>
+     		 {% for comment in comments.all %}
+    			<h3>{{ comment.name }}</h3>
+            <p>{{ comment.email }}</p>
+            <p>{{ comment.pub_date_pretty }}</p>
+    			  <p>{{ comment.comment }}</p>
+     		 {% endfor %}
+	</body>
+</div>
+
+<div class="w3-container" style="margin-left:15%">
+    <center>
+    <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+        </center>
+</div>
+</html>

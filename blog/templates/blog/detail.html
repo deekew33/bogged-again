@@ -30,7 +30,9 @@
       </center>
 <br />
       <br/>
-      <p>{{ blog.body }}</p>
+      {% for paragraph in  blog.paragraphs %}
+      <p>{{ paragraph }}</p>
+      {% endfor %}
       &copy; Bogged Again,  {% now "Y" %}
   </body>
 </div>

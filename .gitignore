@@ -1,3 +1,4 @@
+aws-elastic-beanstalk-cli-setup/
 .ebextensions/
 .elasticbeanstalk/
 .idea/
@@ -10,6 +11,7 @@ polls/boggedagain/stocks/
 stocks/
 trainer/
 db.sqlite3
+settings.py
 *.db*
 *.pickle
 *.png

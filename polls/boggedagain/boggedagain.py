@@ -22,7 +22,6 @@ else:
 standalone = 0
 setup()
 if not os.path.exists('/stuff/venvs/python36'):
-
     lpath = 'C:/Users/DQ/Desktop/ebdjango/'
 else:  # we're on the linux server
     lpath = '/stuff/ebdjango/'
@@ -57,62 +56,71 @@ class ZacksSpider(scrapy.Spider):
         self.finalnews = ['No match'] * len(self.datelist)  # initialization of some variables
         self.urllist = ['No match'] * len(self.datelist)
         self.finalindex = 0
-        for index, date in enumerate(self.datelist):
-            result = google_search(f"{date} {self.ticker}")
-            if int(result['queries']['request'][0]['totalResults']) > 0:
-                url = result['items'][0]['link']
-                if "stock/news" in url: # chances are zacks won't have any news if news isn't in the first url
-                    self.urllist[index] = url
-                    # variable to help us keep track of whether this is the last valid url
-                    self.finalindex = index
+
         self.index = -1
+        self.newslist = 0
+        self.newscounter = 0
         print(self.urllist)
         self.newstext = ['No match'] * len(self.datelist)
 
     def start_requests(self):
+        urls = [f'https://www.zacks.com/stock/quote/{self.ticker}']  # we start by getting the full name
+        # self.log(urls)
+        for url in urls:
+            yield scrapy.Request(url=url, callback=self.parse)
+
+    def parse(self, response):
+        fullname = response.xpath('//h1//a/text()').get()
+        self.log(f'full name is {fullname}')
+        for index, date in enumerate(self.datelist):
+            searchterm = f'{date} "{self.ticker}" {fullname}'
+            result = google_search(searchterm)
+            if int(result['queries']['request'][0]['totalResults']) > 0:
+                url = result['items'][0]['link']
+                self.urllist[index] = url
+                # variable to help us keep track of whether this is the last valid url
+                try:
+                    if 'seekingalpha' in url:
+                        self.finalnews[index] = result['items'][0]['pagemap']['newsarticle'][0]['headline']
+                    else:
+                        self.finalnews[index] = result['items'][0]['title']
+                except:
+                    pass
+                self.finalindex = index
+                self.newscounter += 1
+        self.log(f'final index is {self.finalindex}')
+
         for index, url in enumerate(self.urllist):
             if url != 'No match':
                 self.index = index
                 self.log(f"Now examining {url}")
-                yield scrapy.Request(url=url, callback=self.newsparse)
-        # some weird asynchronous stuff going on here
+                yield scrapy.Request(url=url, callback=self.newsparse, cb_kwargs=dict(index=index))
 
-    def parse(self, response):
-        match = 0
-        rawurllist = response.xpath('//@href').getall()
-        for url in rawurllist:
-            self.log(url)
-            if "www.zacks.com" in url and 'google' not in url:
-                if "stock/news" in url: # chances are zacks won't have any news if news isn't in the first url
-                    # extract next url from search results
-                    self.urllist[self.index] = url[url.index('q=') + 2:]
-                    self.log(self.urllist[self.index])
-                    match = 1
-
-                break
-        if match == 1:
-            return response.follow(self.urllist[self.index], callback=self.newsparse)
-        elif match == 0 and self.index < len(self.datelist) - 2:
-            # if we didn't find a matching result but there are still more dates to check
-            self.index += 1
-            nexturl = f'https://www.google.com/search?q={self.ticker}+{self.datelist[self.index]}+site%3Azacks.com'
-            self.log(nexturl)
-            return response.follow(nexturl, callback=self.parse)
-        else:  # there was no match and we're at the end of dates to check
-            self.save_news()
-            return
-
-    def newsparse(self, response):
-        headline = response.xpath('//article//h1/text()').get()
-        newstext = ' '.join(response.xpath('//div[@id="comtext"]//p/text()').getall())
+    def newsparse(self, response, index):
+        url = self.urllist[index]
+        if "zacks.com" in url:
+            headline = response.xpath('//article//h1/text()').get()
+            newstext = ' '.join(response.xpath('//div[@id="comtext"]//p/text()').getall())
+        elif "seekingalpha.com" in url:
+            headline = response.xpath('//article//h1/text()').get()
+            newstext = ' '.join(response.xpath('//p/text()').getall())
+        elif "reuters.com" in url:
+            headline = response.xpath('//article//h1/text()').get()
+            newstext = ' '.join(response.xpath('//p/text()').getall())
+        else:
+            headline = response.xpath('//article//h1/text()').get()
+            newstext = ' '.join(response.xpath('//p/text()').getall())
         self.log('parsing...')
-        self.newstext[self.index] = newstext
-        self.finalnews[self.index] = headline
+        self.newstext[index] = newstext
+        #self.finalnews[index] = headline
+        self.log(headline)
         # save the news text for training and classification
-        filename = f'{lpath}news/Zacks/{self.ticker}-{self.datelist[self.index]}.txt'
+        filename = f'{lpath}news/Zacks/{self.ticker}-{self.datelist[index]}.txt'
         with open(filename, "w", encoding="utf-8") as text_file:
             print(newstext, file=text_file)
-        if self.index == self.finalindex:
+            self.log(f'File saved as {filename}')
+        self.newslist +=1
+        if self.newslist == self.newscounter:
             self.save_news()
             return
 
@@ -165,6 +173,7 @@ def newscrape(requested, ticker):
     cursor = connection.cursor()
     cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{ticker}';")
     results = cursor.fetchall()
+    print(ticker)
     sql_command = f"""
             CREATE TABLE '{ticker}' ( 
             date text,
@@ -183,8 +192,9 @@ def newscrape(requested, ticker):
     finalpercentlist = []
     finalopenpercent = []
     for x in range(0, len(requested) - 3):
-        results = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = '{requested['Date'][x]}';").fetchall()
-        if requested['Percent'][x] <= targetdrop and len(results)==0:
+        results = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = '{requested['Date'][x]}' "
+                                 f"and source = 'CSE';").fetchall()
+        if requested['Percent'][x] <= targetdrop and len(results) == 0:
             final = truncate((requested["Close"][x + 3] - requested["Close"][x]) / requested["Close"][x])
             final_open = truncate((requested["Open"][x + 3] - requested["Close"][x]) / requested["Close"][x])
             datelist.append(requested["Date"][x])  # saving items of interest to separate lists
@@ -193,6 +203,8 @@ def newscrape(requested, ticker):
             finalopenpercent.append(final_open)
 
     results = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = '{requested['Date'][len(requested) - 1]}';").fetchall()
+    print(requested['Date'][len(requested) - 1])
+    print(datelist)
     if len(results)==0: #if we looked up news today already then don't bother
         datelist.append(requested["Date"][len(requested) - 1])  # we add the items for today as well to the lists
         percentlist.append(requested['Percent'][len(requested) - 1])
@@ -250,7 +262,7 @@ def newscrape(requested, ticker):
         #save directly to database since we don't have enough searches
         for x in range(0, len(datelist)):
             params = (datelist[x], percentlist[x], finalpercentlist[x], finalopenpercent[x],
-                      'No match', 'No match', categorylist[x], 'none')
+                      'No match', 'No match', categorylist[x],'none')
             #print(f"Params about to be inserted are {params}")
             cursor.execute(f"INSERT INTO '{ticker}' VALUES (?, ?, ?, ?, ?, ?, ?, ?)", params)
 
@@ -298,12 +310,12 @@ def newscrape(requested, ticker):
             result = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = {datelist[x]} AND source = 'none'").fetchall()
             if len(result)==0:
                 params = (datelist[x], percentlist[x], finalpercentlist[x],finalopenpercent[x],
-                          headlines.Headline[x], headlines.URL[x], categorylist[x], 'Zacks')
+                          headlines.Headline[x], headlines.URL[x], 'CSE', categorylist[x])
                 #print(f"Params about to be inserted are {params}")
                 cursor.execute(f"INSERT INTO '{ticker}' VALUES (?, ?, ?, ?, ?, ?, ?, ?)", params)
             else:
-                params = (headlines.Headline[x], headlines.URL[x], categorylist[x], 'Zacks',datelist[x])
-                cursor.execute(f"UPDATE '{ticker}' SET 'headline'=? AND 'url'=? AND 'source' = ? WHERE date=? AND ticker=?", params)
+                params = (headlines.Headline[x], headlines.URL[x], categorylist[x], 'CSE',datelist[x])
+                cursor.execute(f"UPDATE '{ticker}' SET 'headline'=? AND 'url'=? AND 'category' = ? AND 'source' = ? WHERE date=?", params)
 
     # now that everything should be inserted into the sql database, we pull it out from the database
     # and turn it into a dataframe
@@ -313,7 +325,7 @@ def newscrape(requested, ticker):
     #print(result)
     finalresult = pd.DataFrame(result,
                                columns=['Date', 'Percent', '3 Day Percent', '3 Day Open Percent', 'Headline', 'URL',
-                                         'Category','Source'])
+                                         'Source', 'Category'])
     finalresult = finalresult.drop('Source', axis=1)
         #finaloutput.assign(Category=categorylist)
         #finalfinal = finaloutput.join(headlines)
@@ -503,7 +515,7 @@ def rangeretrieval():
 
 # for standalone usage
 if __name__ == "__main__":
-    ticker = 'CVNA'
+    ticker = 'SIX'
     starttime = time.strftime("%Y%m%d", time.gmtime(time.time() - 60 * 60 * 24 * 365 * 2))
     abc = extract_quote(ticker, starttime)
     if not isinstance(abc, str):

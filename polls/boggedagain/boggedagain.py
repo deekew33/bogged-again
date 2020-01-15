@@ -60,12 +60,11 @@ class ZacksSpider(scrapy.Spider):
         self.index = -1
         self.newslist = 0
         self.newscounter = 0
-        print(self.urllist)
         self.newstext = ['No match'] * len(self.datelist)
 
     def start_requests(self):
         urls = [f'https://www.zacks.com/stock/quote/{self.ticker}']  # we start by getting the full name
-        # self.log(urls)
+        self.log(urls)
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
@@ -75,26 +74,32 @@ class ZacksSpider(scrapy.Spider):
         for index, date in enumerate(self.datelist):
             searchterm = f'{date} "{self.ticker}" {fullname}'
             result = google_search(searchterm)
-            if int(result['queries']['request'][0]['totalResults']) > 0:
-                url = result['items'][0]['link']
-                self.urllist[index] = url
-                # variable to help us keep track of whether this is the last valid url
-                try:
+            if 'totalResults' in result['queries']['request'][0]:
+                if int(result['queries']['request'][0]['totalResults']) > 0:
+                    newscheck = 0
+                    url = result['items'][0]['link']
                     if 'seekingalpha' in url:
-                        self.finalnews[index] = result['items'][0]['pagemap']['newsarticle'][0]['headline']
+                        if result['items'][0]['pagemap']['newsarticle'][0]['datepublished'][:10] == date:
+                            newscheck = 1
+                            self.finalnews[index] = result['items'][0]['pagemap']['newsarticle'][0]['headline']
                     else:
+                        newscheck = 1
                         self.finalnews[index] = result['items'][0]['title']
-                except:
-                    pass
-                self.finalindex = index
-                self.newscounter += 1
+
+                    if newscheck == 1:
+                        self.urllist[index] = url
+                        self.newstext[index] = result['items'][0]['snippet']
+                        # variable to help us keep track of whether this is the last valid url
+                        self.finalindex = index
+                        self.newscounter += 1
+        self.newscounter = len(set(self.urllist)) - 1 # subtract 1 for the no matches, and remove duplicates
         self.log(f'final index is {self.finalindex}')
 
         for index, url in enumerate(self.urllist):
             if url != 'No match':
                 self.index = index
-                self.log(f"Now examining {url}")
-                yield scrapy.Request(url=url, callback=self.newsparse, cb_kwargs=dict(index=index))
+                self.log(f"Now examining {url} for {self.datelist[index]}")
+                yield scrapy.Request(url=url, callback=self.newsparse, cb_kwargs=dict(index=index), dont_filter = True)
 
     def newsparse(self, response, index):
         url = self.urllist[index]
@@ -111,15 +116,14 @@ class ZacksSpider(scrapy.Spider):
             headline = response.xpath('//article//h1/text()').get()
             newstext = ' '.join(response.xpath('//p/text()').getall())
         self.log('parsing...')
-        self.newstext[index] = newstext
-        #self.finalnews[index] = headline
-        self.log(headline)
+        if len(newstext) > 0:
+            self.newstext[index] = newstext
         # save the news text for training and classification
         filename = f'{lpath}news/Zacks/{self.ticker}-{self.datelist[index]}.txt'
         with open(filename, "w", encoding="utf-8") as text_file:
             print(newstext, file=text_file)
             self.log(f'File saved as {filename}')
-        self.newslist +=1
+        self.newslist += 1
         if self.newslist == self.newscounter:
             self.save_news()
             return
@@ -140,13 +144,11 @@ def extract_quote(ticker, starttime):
     ticker = ticker.upper()
     endtime = time.strftime("%Y%m%d", time.gmtime())  # end time is today in posix time
     # starttime = time.strftime("%Y%m%d",time.gmtime(time.time()-60*60*24*365*2))  # arbitrary 2 year period?
-    requested = []
     loaddata = 0
     if loaddata == 1:
         requested = pd.read_csv(f'{lpath}{ticker}.csv')
     else:
         requested = yqd.load_yahoo_quote(ticker, starttime, endtime, info='quote', format_output='dataframe')
-        time.sleep(5)
     if not isinstance(requested, str):
         requested = requested.replace('null', 'NaN').dropna()  # drop null values
         requested = requested.dropna()
@@ -172,6 +174,7 @@ def newscrape(requested, ticker):
     connection = sqlite3.connect(f"{lpath}results.db")
     cursor = connection.cursor()
     cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{ticker}';")
+
     results = cursor.fetchall()
     print(ticker)
     sql_command = f"""
@@ -203,13 +206,13 @@ def newscrape(requested, ticker):
             finalopenpercent.append(final_open)
 
     results = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = '{requested['Date'][len(requested) - 1]}';").fetchall()
-    print(requested['Date'][len(requested) - 1])
-    print(datelist)
-    if len(results)==0: #if we looked up news today already then don't bother
+    if len(results)==0:  # if we looked up news today already then don't bother
         datelist.append(requested["Date"][len(requested) - 1])  # we add the items for today as well to the lists
         percentlist.append(requested['Percent'][len(requested) - 1])
         finalpercentlist.append(0)  # place holder because we don't know the future percentage change
         finalopenpercent.append(0)
+    cursor.execute(f"UPDATE '{ticker}' SET 'percent'=? WHERE date = '{requested['Date'][len(requested) - 1]}';",
+                   (requested['Percent'][len(requested) - 1],))
     datelist.reverse()  # reverse all the lists to be in reverse chronological order
     percentlist.reverse()
     finalpercentlist.reverse()
@@ -248,21 +251,19 @@ def newscrape(requested, ticker):
         cursor.execute(sql_command)
     # check if we have an entry for today
     results = cursor.execute(f"SELECT searches FROM DailySearch WHERE date='{requested['Date'][len(requested) - 1]}'").fetchall()
-    print(f'Daily search result is {results}')
     if len(results) == 0:
         params = (requested['Date'][len(requested) - 1],0)
         cursor.execute(f"INSERT INTO 'DailySearch' VALUES (?, ?)",params)
         results = [(0,)]
-    print(f"right now we've searched {results} times")
-    print(stuff)
-    if results[0][0] + len(datelist) < 90 and len(datelist) > 0:
+    print(f"right now we've searched {results[0]} times")
+    if results[0][0] + len(datelist) < 350 and len(datelist) > 0:
         run_spider(ZacksSpider, stuff)
         cursor.execute(f"UPDATE 'DailySearch' SET searches = {results[0][0] + len(datelist)} WHERE date = '{requested['Date'][len(requested) - 1]}';")
-    elif results[0][0] + len(datelist) > 90 and len(datelist) > 0:
+    elif results[0][0] + len(datelist) > 350 and len(datelist) > 0:
         #save directly to database since we don't have enough searches
         for x in range(0, len(datelist)):
             params = (datelist[x], percentlist[x], finalpercentlist[x], finalopenpercent[x],
-                      'No match', 'No match', categorylist[x],'none')
+                      'No match', 'No match', 'none', categorylist[x])
             #print(f"Params about to be inserted are {params}")
             cursor.execute(f"INSERT INTO '{ticker}' VALUES (?, ?, ?, ?, ?, ?, ?, ?)", params)
 
@@ -271,7 +272,7 @@ def newscrape(requested, ticker):
     # crawling to complete.
     timeout = 0
     while not os.path.exists(f'{lpath}stocks/Zacks/headlines-{ticker}.csv')\
-            and results[0][0] + len(datelist) < 90 and timeout < 150 and len(datelist) > 0:
+            and results[0][0] + len(datelist) < 350 and timeout < 150 and len(datelist) > 0:
         time.sleep(5)  # assume it takes 1 second per page, 20 days of news on one page
         timeout += 5
     # if the spider ran successfully, it will have saved the headlines in a csv in the same directory
@@ -420,7 +421,7 @@ def dailystats(date):
         starttime = time.strftime("%Y%m%d", time.gmtime(time.time() - 60 * 60 * 24 * 365 * 2))
         for ticker in tickerlist:
             try:
-                #    print(f'Trying {ticker}')
+                print(f'Trying {ticker}')
                 requested = extract_quote(ticker, starttime)
                 requested = newscrape(requested, ticker)
                 createstat(requested, ticker)
@@ -515,7 +516,7 @@ def rangeretrieval():
 
 # for standalone usage
 if __name__ == "__main__":
-    ticker = 'SIX'
+    ticker = 'ABMD'
     starttime = time.strftime("%Y%m%d", time.gmtime(time.time() - 60 * 60 * 24 * 365 * 2))
     abc = extract_quote(ticker, starttime)
     if not isinstance(abc, str):

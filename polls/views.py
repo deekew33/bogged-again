@@ -6,7 +6,7 @@ from django.utils import timezone
 from .models import Ticker
 from .forms import TickerForm
 from .boggedagain import boggedagain
-import math, time, os, sqlite3
+import math, time, os, sqlite3, pandas
 if not os.path.exists('/stuff/venvs/python36'):
     lpath = ''
 else: #we're on the linux server
@@ -22,11 +22,10 @@ def bogging(request):
         return render(request, 'polls/error.html', {'error': requested})
     else:
         stats = boggedagain.createstat(requested, ticker)
-        requested = requested.set_index('URL')
-
-    return render(request, 'polls/bogging.html',
-                  {'headers':requested.columns,'finaldata':requested.iterrows(),
-                   'ticker':ticker,'statheaders':stats.columns, 'stats':stats.iterrows()})
+        #requested = requested.set_index('URL')
+    requestjson = requested.to_json(orient='records')
+    return render(request, 'polls/bogging.html',  {'ticker':ticker,'statheaders':stats.columns,
+                                                   'stats':stats.iterrows(),'json':requestjson})
 
 def input(request):
     return render(request, 'polls/input.html')

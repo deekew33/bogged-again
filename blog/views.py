@@ -33,4 +33,4 @@ def detail(request, blog_id):
     #get all comments for a certain blog id
     comments = Comment.objects.filter(blog_id=blog_id)
     blogdetail.paragraphs=blogdetail.body.split('\r\n')
-    return render(request, 'blog/detail.html', {'blog': blogdetail,'form':form,'comments':comments})
+    return render(request, 'blog/detail.html', {'blog': blogdetail,'form':form,'comments':comments,'blog_id':blog_id})

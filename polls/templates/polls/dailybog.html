@@ -29,7 +29,11 @@
         {% for thing in column %}
             {% cycle '<tr>' '' '' '' '' '' '' '' '' '' '' %}
                 <td><center>
-                        {{thing}}
+                    {% if thing|length < 5 and "." not in thing %}
+                        <a href= "http://www.boggedaga.in/bogging?ticker={{thing}}">{{thing}}</a>
+                    {% else %}
+                       {{thing}}
+                    {% endif %}
                 </center></td>
             {% cycle '' '' '' '' '' '' '' '' '' '' '</tr>' %}
         {% endfor %}

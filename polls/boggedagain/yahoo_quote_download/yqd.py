@@ -125,8 +125,8 @@ def load_yahoo_quote(ticker, begindate, enddate, info = 'quote', format_output =
 				opener = urllib.request.build_opener(cookier)
 				urllib.request.install_opener(opener)
 				_get_cookie_crumb()
-				print("<p>Error: %s</p>" % e)
-	#print(alines)
+				print("Error: %s" % e)
+#	print(alines)
 	if format_output == 'list':
 		return alines.split('\n')
 

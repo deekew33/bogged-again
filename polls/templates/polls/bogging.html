@@ -1,0 +1,92 @@
+<head>
+<title> {{ticker}} data </title>
+    {% load static %}
+    <script src="{% static "sorttable.js" %}"></script>
+</head>
+<link href={% static "tabulator.min.css" %} rel="stylesheet">
+<link rel="stylesheet" href={% static "w3.css" %}>
+<header class="w3-container w3-red">
+  <h1>Bogged Again!</h1>
+</header>
+<div class="w3-sidebar w3-bar-block" style="width:15%">
+  <a href=http://www.boggedaga.in class="w3-bar-item w3-button">Home</a>
+  <a href=http://www.boggedaga.in/entrance class="w3-bar-item w3-button">The Bogchives</a>
+  <a href=http://www.boggedaga.in/dailybog class="w3-bar-item w3-button">The Daily Bog</a>
+      <a href=http://www.boggedaga.in/blog class="w3-bar-item w3-button">Blogged again</a>
+      <img src={% static "bogsidebar.png" %} alt="Header">
+</div>
+
+
+<div class="table-controls" style="margin-left:15%">
+<center>
+<button id="del-row">Remove Selected Rows</button>
+<button id="reset">Reset</button>
+</center>
+</div>
+<div id="example-table" class="w3-container" style="margin-left:15%">
+
+</div>
+<script type="text/javascript" src={% static "jquery-3.4.1.js" %}></script>
+<script type="text/javascript" src={% static "jquery-ui.min.js" %}></script>
+<script src={% static "tabulator.min.js" %}></script>
+<script>
+{% autoescape off %}
+    var tabledata = {{json}};
+{% endautoescape %}
+
+    var table = new Tabulator("#example-table", {
+        data:tabledata, //assign data to table
+        layout:"fitData", //fit columns to width of table (optional)
+        columns:[ //Define Table Columns
+            {formatter:"rowSelection", titleFormatter:"rowSelection", align:"center", headerSort:false,
+                cellClick:function(e, cell){cell.getRow().toggleSelect();}},
+            {title:"Date", field:"Date",  align:"center",},
+            {title:"Percent", field:"Percent",  align:"center",},
+            {title:"3 Day Percent", field:"3 Day Percent", align:"center", topCalc:"avg"},
+            {title:"3 Day Open Percent", field:"3 Day Open Percent", align:"center", topCalc:"avg"},
+            {title:"Headline", field:"Headline", align:"center",formatter:"link",formatterParams:{labelField: "Headline", urlField:'URL'}},
+            {title:"Category", field:"Category", align:"center",},
+ 	        ],
+    });
+
+    $("#del-row").click(function(){
+    table.deleteRow(table.getSelectedRows());
+    });
+
+    $("#reset").click(function(){
+    table.setData(tabledata);
+    });
+
+</script>
+
+<div class="w3-container" style="margin-left:15%">
+<center>
+    <p> Other data:</p>
+    <table border="1" class="sortable w3-table w3-bordered w3-striped">
+        <tr>
+            {% for item in statheaders %}
+                <th>{{item}}</th>
+            {% endfor %}
+        </tr>
+        {% for item, column in stats %}
+            {% for thing in column %}
+                {% cycle '<tr>' '' '' '' '' '' '' %}
+                    <td><center>
+                            {{thing}}
+                    </center></td>
+                {% cycle '' '' '' '' ''  '' '</tr>' %}
+            {% endfor %}
+        {% endfor %}
+    </table>
+</center>
+</div>
+
+<div class="w3-container" style="margin-left:15%">
+<center>
+<p>Try again? </p>
+<form action='/bogging/'>
+    <textarea name="ticker" cols=5 rows=3></textarea>
+    <input type="submit" value="Submit">
+</form>
+</center>
+</div>

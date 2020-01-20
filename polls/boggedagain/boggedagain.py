@@ -5,7 +5,7 @@ sys.path.append('/stuff/venvs/python36/local/lib64/python3.6/dist-packages')
 from shutil import copyfile
 import os.path
 import os, csv, pandas as pd, time, scrapy, bisect, logging, pickle, math, sqlite3
-import key_manager
+from . import key_manager
 from scrapy.crawler import CrawlerRunner, CrawlerProcess
 from scrapy.utils.log import configure_logging
 from scrapy.utils.project import get_project_settings

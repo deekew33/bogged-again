@@ -28,7 +28,11 @@ def bogging(request):
                                                    'stats':stats.iterrows(),'json':requestjson})
 
 def input(request):
-    return render(request, 'polls/input.html')
+    # Homepage built with Bootstrap 4
+    return render(request, 'polls/index.html')
+
+    # Original homepage
+    # return render(request, 'polls/input.html')
 
 def dailybog(request):
     date = time.strftime("%Y-%m-%d",time.localtime()) #gm time is 5 hours ahead of EST

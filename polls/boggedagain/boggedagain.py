@@ -5,7 +5,7 @@ sys.path.append('/stuff/venvs/python36/local/lib64/python3.6/dist-packages')
 from shutil import copyfile
 import os.path
 import os, csv, pandas as pd, time, scrapy, bisect, logging, pickle, math, sqlite3
-from . import key_manager
+
 from scrapy.crawler import CrawlerRunner, CrawlerProcess
 from scrapy.utils.log import configure_logging
 from scrapy.utils.project import get_project_settings
@@ -15,14 +15,16 @@ from crochet import setup, wait_for, run_in_reactor, retrieve_result, TimeoutErr
 
 if __name__ == "__main__":
     import classifier as cl
+    import key_manager
     from yahoo_quote_download import yqd
 else:
     from . import classifier as cl
+    from . import key_manager
     from .yahoo_quote_download import yqd
 standalone = 0
 setup()
 if not os.path.exists('/stuff/venvs/python36'):
-    lpath = 'C:/Users/DQ/Desktop/ebdjango/'
+    lpath = ''
 else:  # we're on the linux server
     lpath = '/stuff/ebdjango/'
 loaddata = 0  # token for reloading data pulled earlier
@@ -79,9 +81,13 @@ class ZacksSpider(scrapy.Spider):
                     newscheck = 0
                     url = result['items'][0]['link']
                     if 'seekingalpha' in url:
-                        if result['items'][0]['pagemap']['newsarticle'][0]['datepublished'][:10] == date:
+                        try:
+                            if result['items'][0]['pagemap']['webpage'][0]['datepublished'][:10] == date:
+                                newscheck = 1
+                                self.finalnews[index] = result['items'][0]['pagemap']['webpage'][0]['headline']
+                        except:
                             newscheck = 1
-                            self.finalnews[index] = result['items'][0]['pagemap']['newsarticle'][0]['headline']
+                            self.finalnews[index] = result['items'][0]['title']
                     else:
                         newscheck = 1
                         self.finalnews[index] = result['items'][0]['title']
@@ -91,42 +97,8 @@ class ZacksSpider(scrapy.Spider):
                         self.newstext[index] = result['items'][0]['snippet']
                         # variable to help us keep track of whether this is the last valid url
                         self.finalindex = index
-                        self.newscounter += 1
-        self.newscounter = len(set(self.urllist)) - 1 # subtract 1 for the no matches, and remove duplicates
-        self.log(f'final index is {self.finalindex}')
-
-        for index, url in enumerate(self.urllist):
-            if url != 'No match':
-                self.index = index
-                self.log(f"Now examining {url} for {self.datelist[index]}")
-                yield scrapy.Request(url=url, callback=self.newsparse, cb_kwargs=dict(index=index), dont_filter = True)
-
-    def newsparse(self, response, index):
-        url = self.urllist[index]
-        if "zacks.com" in url:
-            headline = response.xpath('//article//h1/text()').get()
-            newstext = ' '.join(response.xpath('//div[@id="comtext"]//p/text()').getall())
-        elif "seekingalpha.com" in url:
-            headline = response.xpath('//article//h1/text()').get()
-            newstext = ' '.join(response.xpath('//p/text()').getall())
-        elif "reuters.com" in url:
-            headline = response.xpath('//article//h1/text()').get()
-            newstext = ' '.join(response.xpath('//p/text()').getall())
-        else:
-            headline = response.xpath('//article//h1/text()').get()
-            newstext = ' '.join(response.xpath('//p/text()').getall())
-        self.log('parsing...')
-        if len(newstext) > 0:
-            self.newstext[index] = newstext
-        # save the news text for training and classification
-        filename = f'{lpath}news/Zacks/{self.ticker}-{self.datelist[index]}.txt'
-        with open(filename, "w", encoding="utf-8") as text_file:
-            print(newstext, file=text_file)
-            self.log(f'File saved as {filename}')
-        self.newslist += 1
-        if self.newslist == self.newscounter:
-            self.save_news()
-            return
+        self.save_news()
+        return
 
 
     def save_news(self):
@@ -140,31 +112,31 @@ class ZacksSpider(scrapy.Spider):
         a.close()
 
 
-def extract_quote(ticker, starttime):
+def extract_quote(ticker, starttime, endtime=time.strftime("%Y%m%d", time.gmtime())):
     ticker = ticker.upper()
-    endtime = time.strftime("%Y%m%d", time.gmtime())  # end time is today in posix time
-    # starttime = time.strftime("%Y%m%d",time.gmtime(time.time()-60*60*24*365*2))  # arbitrary 2 year period?
+    # endtime = time.strftime("%Y%m%d", time.gmtime())  # end time is today in posix time
     loaddata = 0
     if loaddata == 1:
         requested = pd.read_csv(f'{lpath}{ticker}.csv')
     else:
         requested = yqd.load_yahoo_quote(ticker, starttime, endtime, info='quote', format_output='dataframe')
     if not isinstance(requested, str):
-        requested = requested.replace('null', 'NaN').dropna()  # drop null values
-        requested = requested.dropna()
+        requested = requested.replace('null', 'NaN')  # drop null values
         requested['Open'] = requested['Open'].astype(
             'float64')  # converting data types to floats and calculating percentages
         requested['Close'] = requested['Close'].astype('float64')
-        # if save == 1:
-        #    requested.to_csv(f'{lpath}stocks/{ticker}.csv')  # save extracted data to csv to avoid tangling with YQD
+        #requested.to_csv(f'{lpath}{ticker}.csv')  # save extracted data to csv to avoid tangling with YQD
         requested['Percent'] = requested['Close']
+        nanindex = min(requested.isna()[::-1].idxmax().values)
+        if nanindex < len(requested) - 1:
+            requested = requested[requested.index > nanindex].reset_index(drop=True)
         for x in range(1, len(requested)):
             requested['Percent'][x] = truncate(
                 (requested['Close'][x] - requested['Close'][x - 1]) / requested['Close'][x - 1])
     return requested
 
 
-def newscrape(requested, ticker):
+def newscrape(requested, ticker, daily=0):
     # here begins the definition for the web scraper
     #logging.getLogger('scrapy').propagate = False  # turn off logging
     targetdrop = requested['Percent'][len(requested) - 1] * 0.9
@@ -176,7 +148,6 @@ def newscrape(requested, ticker):
     cursor.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name='{ticker}';")
 
     results = cursor.fetchall()
-    print(ticker)
     sql_command = f"""
             CREATE TABLE '{ticker}' ( 
             date text,
@@ -187,7 +158,6 @@ def newscrape(requested, ticker):
             url text,
             source text,
             category text) """
-    print(len(results))
     if len(results) == 0:
         cursor.execute(sql_command)
     datelist = []  # placeholder for dates of interest
@@ -255,25 +225,25 @@ def newscrape(requested, ticker):
         params = (requested['Date'][len(requested) - 1],0)
         cursor.execute(f"INSERT INTO 'DailySearch' VALUES (?, ?)",params)
         results = [(0,)]
-    print(f"right now we've searched {results[0]} times")
-    if results[0][0] + len(datelist) < 350 and len(datelist) > 0:
+    if results[0][0] + len(datelist) < 350 and len(datelist) > 0 and daily == 0:
         run_spider(ZacksSpider, stuff)
         cursor.execute(f"UPDATE 'DailySearch' SET searches = {results[0][0] + len(datelist)} WHERE date = '{requested['Date'][len(requested) - 1]}';")
-    elif results[0][0] + len(datelist) > 350 and len(datelist) > 0:
-        #save directly to database since we don't have enough searches
+    elif (results[0][0] + len(datelist) > 350 and len(datelist) > 0) or daily == 1:
+        #save directly to database since we don't have enough searches/or don't want to search news
         for x in range(0, len(datelist)):
             params = (datelist[x], percentlist[x], finalpercentlist[x], finalopenpercent[x],
                       'No match', 'No match', 'none', categorylist[x])
-            #print(f"Params about to be inserted are {params}")
-            cursor.execute(f"INSERT INTO '{ticker}' VALUES (?, ?, ?, ?, ?, ?, ?, ?)", params)
+            search_result = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = '{datelist[x]}'").fetchall()
+            if len(search_result) == 0:
+                cursor.execute(f"INSERT INTO '{ticker}' VALUES (?, ?, ?, ?, ?, ?, ?, ?)", params)
 
 
     # since scrapy checks the news page by page, if the first and last date are far apart it may take some time for the
     # crawling to complete.
     timeout = 0
     while not os.path.exists(f'{lpath}stocks/Zacks/headlines-{ticker}.csv')\
-            and results[0][0] + len(datelist) < 350 and timeout < 150 and len(datelist) > 0:
-        time.sleep(5)  # assume it takes 1 second per page, 20 days of news on one page
+            and results[0][0] + len(datelist) < 350 and timeout < 150 and len(datelist) > 0 and daily == 0:
+        time.sleep(5)
         timeout += 5
     # if the spider ran successfully, it will have saved the headlines in a csv in the same directory
     if os.path.exists(f'{lpath}stocks/Zacks/headlines-{ticker}.csv') and len(datelist) > 0:
@@ -285,30 +255,8 @@ def newscrape(requested, ticker):
                                     '3 Day Open Percent': finalopenpercent})
         finaloutput.assign(Headline=headlines.Headline)
         # finaloutput.assign(MatchPercent=headlines.MatchPercent)
-
-        # unpickle pre-generated classifier to classify news
-        f = open(f'{lpath}polls/boggedagain/my_classifier.pickle', 'rb')
-        classifier = pickle.load(f)
-        f.close()
-        categorydecoder = {'AD': 'Analyst downgrade', 'B': 'Bankruptcy', 'CS': 'Company scandal',
-                           'LC': 'Leadership change',
-                           'LG': 'Lowered guidance', 'LL': 'Lost lawsuit', 'LS': 'Leadership scandal', 'M': 'Merger',
-                           'NO': 'New options', 'PO': 'Public offering',
-                           'R': 'Regulation', 'RL': 'Restructuring/Layoff', 'RM': 'Revenue miss', 'SD': 'Sector dump',
-                           'SS': 'Stock split', 'T': 'Trump', 'TW': 'Trade war'}
         for x in range(0, len(headlines.Headline)):
-            if headlines.Headline[x] != 'No match':
-                filename = f'{ticker}-{time.strftime("%Y-%m-%d", time.gmtime(datesecs[x]))}'
-                with open(f'{lpath}news/Zacks/{filename}.txt', encoding="utf-8") as f:
-                    data = f.read()
-                    f.close()
-                    category = classifier.classify(cl.news_features(data))
-                    categorylist[x] = categorydecoder[category]
-                    # if this is not part of the training set yet, copy over as unlabeled so I can label it later.
-                    if not os.path.exists(f'{lpath}trainer/Zacks/{category}/{filename}_labeled.txt'):
-                        copyfile(f'{lpath}news/Zacks/{filename}.txt', f'{lpath}trainer/Zacks/{filename}.txt')
-                        os.remove(f'{lpath}news/Zacks/{filename}.txt')
-            result = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = {datelist[x]} AND source = 'none'").fetchall()
+            result = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date = '{datelist[x]}' AND source = 'none'").fetchall()
             if len(result)==0:
                 params = (datelist[x], percentlist[x], finalpercentlist[x],finalopenpercent[x],
                           headlines.Headline[x], headlines.URL[x], 'CSE', categorylist[x])
@@ -316,30 +264,19 @@ def newscrape(requested, ticker):
                 cursor.execute(f"INSERT INTO '{ticker}' VALUES (?, ?, ?, ?, ?, ?, ?, ?)", params)
             else:
                 params = (headlines.Headline[x], headlines.URL[x], categorylist[x], 'CSE',datelist[x])
-                cursor.execute(f"UPDATE '{ticker}' SET 'headline'=? AND 'url'=? AND 'category' = ? AND 'source' = ? WHERE date=?", params)
+                cursor.execute(f"UPDATE '{ticker}' SET 'headline'=? AND 'url'=? AND 'category' = ? AND 'source' = ? WHERE 'date'=?", params)
 
     # now that everything should be inserted into the sql database, we pull it out from the database
     # and turn it into a dataframe
     result = cursor.execute(f"SELECT * FROM '{ticker}' WHERE date > {requested['Date'][0]} "
                             f" AND percent < {targetdrop} ORDER BY date DESC").fetchall()
-    #result = cursor.execute(f"SELECT * FROM '{ticker}' WHERE percent < {targetdrop} ORDER BY date DESC").fetchall()
-    #print(result)
     finalresult = pd.DataFrame(result,
                                columns=['Date', 'Percent', '3 Day Percent', '3 Day Open Percent', 'Headline', 'URL',
                                          'Source', 'Category'])
     finalresult = finalresult.drop('Source', axis=1)
-        #finaloutput.assign(Category=categorylist)
-        #finalfinal = finaloutput.join(headlines)
-        #finalfinal['Category'] = pd.Series(categorylist, index=finalfinal.index)
     connection.commit()
     connection.close()
     return finalresult
-    # print(__name__)
-    # if __name__ == '__main__':
-    #    p = Process(target=run_spider, args=(requested,ticker))
-    #    p.start()
-    #    p.join()
-    # run_spider(requested,ticker)
 
 
 #  method to save a daily value into a sqlite database
@@ -365,9 +302,14 @@ def createstat(requested, ticker):
         cursor.execute(sql_command)  # generate the table if it doesn't exist
     today = requested['Date'][0]
     if len(requested) >= 2:  # only do calculations if there's more than one row
-        med = truncate(requested[requested['Date'] != today]['3 Day Percent'].median(), False)
-        mean = truncate(requested[requested['Date'] != today]['3 Day Percent'].mean(), False)
-        samplesize = len(requested) - 1
+        try:
+            med = truncate(requested[requested['Date'] != today]['3 Day Percent'].median(), False)
+            mean = truncate(requested[requested['Date'] != today]['3 Day Percent'].mean(), False)
+            samplesize = len(requested) - 1
+        except:
+            med = 0
+            mean = 0
+            samplesize = 1
         try:
             med_cat = requested[(requested['Date'] != today) & (requested['Category'] ==
                                                                 requested['Category'][0])]['3 Day Percent'].median()
@@ -389,22 +331,20 @@ def createstat(requested, ticker):
         mean_cat = 0
         sample_cat = 0
     pospercent = truncate(len(requested[requested['3 Day Percent'] > 0]) / samplesize)
-    # rank = math.ceil((1 - 1/samplesize)*(med + mean)*100*pospercent)/100 # updated 11/26
     rank = math.ceil(samplesize * med * 100 * pospercent) / 100
 
     searchparams = (today, ticker)
     cursor.execute("SELECT * FROM 'Daily Stats' WHERE time=? AND ticker=?", searchparams)
     result = cursor.fetchall()
 
-    # for r in result:
-    #    print(r)
     if len(result) == 0:
+        print(f"Inserting data into daily stats..")
         params = (
         today, ticker, requested['Percent'][0], samplesize, med, mean, pospercent, sample_cat, med_cat, mean_cat, rank)
         cursor.execute("INSERT INTO 'Daily Stats' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", params)
     else:
-        params = (requested['Percent'][0], today, ticker)
-        cursor.execute("UPDATE 'Daily Stats' SET 'percent'=? WHERE time=? AND ticker=?", params)
+        params = (requested['Percent'][0], rank, today, ticker)
+        cursor.execute("UPDATE 'Daily Stats' SET 'percent'=?, 'rank' = ? WHERE time=? AND ticker=?", params)
 
     cursor.execute("SELECT * FROM 'Daily Stats'")
     connection.commit()
@@ -416,30 +356,58 @@ def createstat(requested, ticker):
 
 
 def dailystats(date):
+    daily = 0
     if os.path.exists(f'{lpath}media/files/screener_results.csv'):
-        tickerlist = pd.read_csv(f'{lpath}media/files/screener_results.csv')['Symbol']
+        data = pd.read_csv(f'{lpath}media/files/screener_results.csv')
+        nanindex = min(data.isna().idxmax().values)
+        data = data[data.index < nanindex]
+        tickerlist = data['Symbol']
         starttime = time.strftime("%Y%m%d", time.gmtime(time.time() - 60 * 60 * 24 * 365 * 2))
+        daily = 1
         for ticker in tickerlist:
-            try:
-                print(f'Trying {ticker}')
-                requested = extract_quote(ticker, starttime)
-                requested = newscrape(requested, ticker)
+            print(f'Trying {ticker}')
+            requested = extract_quote(ticker, starttime)
+            requested = newscrape(requested, ticker, daily)
+            if not isinstance(requested, str):
                 createstat(requested, ticker)
-            except:
-                pass
         os.remove(f'{lpath}media/files/screener_results.csv')
     connection = sqlite3.connect(f"{lpath}results.db")
     cursor = connection.cursor()
+    if daily ==1 :
+        for ticker in tickerlist:
+            results = cursor.execute(f"SELECT * FROM 'Stockfacts' WHERE ticker = '{ticker}'").fetchall()
+            capstring = data['Market Capitalization'][data['Symbol']==ticker].values[0]
+            if capstring[-1] == 'B':
+                cap = truncate(float(capstring[1:-1])*1000, False)
+            else:
+                cap = truncate(float(capstring[1:-1]), False)
+            params = (ticker,
+                      data['Company Name'][data['Symbol'] == ticker].values[0],
+                      cap,
+                      data['Sector'][data['Symbol'] == ticker].values[0],
+                      data['Industry'][data['Symbol'] == ticker].values[0],
+                      data['Sub-Industry'][data['Symbol'] == ticker].values[0],
+                      data['Company Headquarters Location'][data['Symbol'] == ticker].values[0])
+            # print(f"Adding stock facts for {ticker} with parameters of {params}")
+            if len(results) != 0:
+                cursor.execute(f"DELETE FROM 'Stockfacts' WHERE ticker='{ticker}'")
+            cursor.execute("INSERT INTO 'Stockfacts' VALUES (?, ?, ?, ?, ?, ?, ?)", params)
     searchparams = [date]
-    cursor.execute("SELECT * FROM 'Daily Stats' WHERE time=?", searchparams)
+
+    sql_command = "SELECT DS.time, DS.ticker, DS.percent, DS.'sample size', DS.'3 day median', DS.'3 day mean'," \
+                  "DS.'pos percent', SF.cap, SF.sector, SF.industry, DS.rank " \
+                  "FROM 'Daily Stats' AS DS LEFT JOIN Stockfacts as SF " \
+                  "ON DS.ticker = SF.ticker WHERE DS.time =? ORDER BY rank DESC"
+    cursor.execute(sql_command, searchparams)
     result = cursor.fetchall()
+    connection.commit()
     connection.close()
     if len(result) == 0:
         return "There are either no stocks looked at today yet or today's not a business day."
     else:
         finalresult = pd.DataFrame(result,
                                    columns=['Date', 'Ticker', 'Percent', 'N', 'Median', 'Mean', 'Positive Percent',
-                                            'N_cat', 'Same Cat Median', 'Same Cat Mean', 'Rank'])
+                                            'Market Cap(M)', 'Sector', 'Industry', 'Rank'])
         return finalresult
 
 
@@ -516,7 +484,7 @@ def rangeretrieval():
 
 # for standalone usage
 if __name__ == "__main__":
-    ticker = 'ABMD'
+    ticker = 'ACMR'
     starttime = time.strftime("%Y%m%d", time.gmtime(time.time() - 60 * 60 * 24 * 365 * 2))
     abc = extract_quote(ticker, starttime)
     if not isinstance(abc, str):

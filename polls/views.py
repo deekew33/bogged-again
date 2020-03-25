@@ -28,8 +28,10 @@ def bogging(request):
                                                    'stats':stats.iterrows(),'json':requestjson})
 
 def input(request):
+    title = "Bogged Again!"
+    
     # Homepage built with Bootstrap 4
-    return render(request, 'polls/index.html')
+    return render(request, 'polls/index.html', {'title': title})
 
     # Original homepage
     # return render(request, 'polls/input.html')

@@ -1,16 +1,11 @@
 html {
-    /* Background image will occupy 100% of window height */
+    /* Background image (if used) will occupy 100% of window height */
     height: 100%;
 }
 
-body {
-    /* TODO: Download images to repo? */
-    /* Option 1: Photo by Elvis Bekmanis on Unsplash */
+#body-index {
+    /* Photo by Elvis Bekmanis on Unsplash */
     background-image: url("https://images.unsplash.com/photo-1556805004-144cdda5da89?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1933&q=80");
-
-    /* Option 2: https://en.wikipedia.org/wiki/File:Hommik_Mukri_rabas.jpg#filelinks */
-    /* Hommik_Mukri_rabas.jpg uses Creative Commons Attribution-ShareAlike 3.0 Estonia */
-    /* background-image: url("https://upload.wikimedia.org/wikipedia/commons/e/e6/Hommik_Mukri_rabas.jpg"); */
 
     background-position: center;
     background-size: cover;
@@ -18,27 +13,9 @@ body {
     font-family: 'Raleway', sans-serif;
 }
 
-#index-top-navbar {
-    /* Option 1: Dark greenish background */
-    background-color: #2c3f48;
-
-    /* Option 2: Bogdanoff navbar background */
-    /* background-image: url("../../../../media/images/bogheader.png");
-    background-position: center;
-    background-size: cover; */
-}
-
 .jumbotron {
-    /* Option 1: Transparent purple background */
+    /* Transparent purple background */
     background-color: rgba(144, 132, 142, 0.5);
-
-    /* Option 2: Transparent background */
-    /* background-color: transparent; */
-
-    /* Option 3: Bogdanoff background */
-    /* background-image: url("https://i.ytimg.com/vi/TRXdxiot5JM/maxresdefault.jpg");
-    background-position: center;
-    background-size: cover; */
 
     /* White text color */
     color: white;
@@ -47,17 +24,3 @@ body {
     /* Margin so jumbotron is near middle of page */
     margin-top: 15%;
 }
-
-/* Option 4: Transparent Bogdanoff background */
-/* .jumbotron::after {
-    background-image: url("https://i.ytimg.com/vi/TRXdxiot5JM/maxresdefault.jpg");
-
-    content: "";
-    opacity: 0.5;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-} */

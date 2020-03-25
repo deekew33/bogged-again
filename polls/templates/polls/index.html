@@ -2,40 +2,49 @@
 
 {% block title %}{{ title }}{% endblock title %}
 
-{% block content %}
-<!-- Jumbotron -->
-<div class="container">
-  <div class="jumbotron">
-    <h1 class="display-4">He bought? Pump it.</h1>
+{% block body_content %}
+<body id="body-index">
+  <!-- Navbar at top of page -->
+  {% include 'polls/top_navbar.html' %}
+  
+  <!-- Jumbotron -->
+  <div class="container">
+    <div class="jumbotron">
+      <h1 class="display-4">He bought? Pump it.</h1>
 
-    <!-- Hide text from xs to sm, show for larger screen sizes -->
-    <p class="lead d-none d-md-block">
-      Ever wonder how to "Buy low, sell high"? 
-      Given a ticker in the red, Bogged Again! searches the last two years for dates when the stock had a greater drop. 
-      The changes three days later are shown so you can go all in.
-    </p>
+      <!-- Hide text from xs to sm, show for larger screen sizes -->
+      <p class="lead d-none d-md-block">
+        Ever wonder how to "Buy low, sell high"? 
+        Given a ticker in the red, Bogged Again! searches the last two years for dates when the stock had a greater drop. 
+        The changes three days later are shown so you can go all in.
+      </p>
 
-    <hr class="my-4">
+      <hr class="my-4">
 
-    <p>See dip. Check history below. Buy dip. Profit!</p>
-    
-    <!-- Form for submitting stock ticker -->
-    <form action='/bogging/' class="d-flex justify-content-center">
-      <div class="form-row align-items-center">
-          <div class="col-auto my-1">
-          <label for="inlineFormInputGroupTickerSymbol" class="sr-only">Ticker Symbol</label>
+      <p>See dip. Check history below. Buy dip. Profit!</p>
+      
+      <!-- Form for submitting stock ticker -->
+      <form action='/bogging/' class="d-flex justify-content-center">
+        <div class="form-row align-items-center">
+            <div class="col-auto my-1">
+            <label for="inlineFormInputGroupTickerSymbol" class="sr-only">Ticker Symbol</label>
 
-          <div class="input-group">
-            <input type="search" name="ticker" class="form-control-lg" id="inlineFormInputGroupTickerSymbol" placeholder="TICKER SYMBOL" aria-label="TICKER SYMBOL" aria-describedby="ticker-button">
+            <div class="input-group">
+              <input type="search" name="ticker" class="form-control-lg" id="inlineFormInputGroupTickerSymbol" placeholder="TICKER SYMBOL" aria-label="TICKER SYMBOL" aria-describedby="ticker-button">
 
-            <div class="input-group-append">
-              <button class="btn btn-primary btn-lg" type="submit" id="ticker-button">Submit</button>
+              <div class="input-group-append">
+                <button class="btn btn-primary btn-lg" type="submit" id="ticker-button">Submit</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </form>
+      </form>
 
+    </div>
   </div>
-</div>
-{% endblock content %}
+  
+  <!-- Bootstrap Scripts -->
+  {% include 'polls/bootstrap_scripts.html' %}
+  
+</body>
+{% endblock body_content %}

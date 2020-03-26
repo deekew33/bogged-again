@@ -13,23 +13,35 @@ else: #we're on the linux server
     lpath = '/stuff/ebdjango/'
 
 def bogging(request):
+    title = "Daily Bog"
     ticker = request.GET['ticker'].upper()
     starttime = time.strftime("%Y%m%d",time.gmtime(time.time()-60*60*24*365*2))
     requested = boggedagain.extract_quote(ticker, starttime)
     if not isinstance(requested, str):
         requested = boggedagain.newscrape(requested, ticker)
     if isinstance(requested, str):
-        return render(request, 'polls/error.html', {'error': requested})
+        return render(request,
+                      'polls/error.html',
+                      {
+                        'title': title,
+                        'error': requested
+                      })
     else:
         stats = boggedagain.createstat(requested, ticker)
         #requested = requested.set_index('URL')
     requestjson = requested.to_json(orient='records')
-    return render(request, 'polls/bogging.html',  {'ticker':ticker,'statheaders':stats.columns,
-                                                   'stats':stats.iterrows(),'json':requestjson})
+    return render(request,
+                  'polls/bogging.html',
+                  {
+                    'ticker':ticker,
+                    'statheaders':stats.columns,
+                    'stats':stats.iterrows(),
+                    'json':requestjson
+                  })
 
 def input(request):
     title = "Bogged Again!"
-    
+
     # Homepage built with Bootstrap 4
     return render(request, 'polls/index.html', {'title': title})
 
@@ -37,11 +49,23 @@ def input(request):
     # return render(request, 'polls/input.html')
 
 def dailybog(request):
+    title = "Daily Bog"
     date = time.strftime("%Y-%m-%d",time.localtime()) #gm time is 5 hours ahead of EST
     dailydata = boggedagain.dailystats(date)
     if isinstance(dailydata, str):
-        return render(request, 'polls/error.html', {'error': dailydata})
-    return render(request, 'polls/dailybog.html',{'headers':dailydata.columns,'finaldata':dailydata.iterrows()})
+        return render(request,
+                      'polls/error.html',
+                      {
+                        'title': title,
+                        'error': dailydata
+                      })
+    return render(request,
+                  'polls/dailybog.html',
+                  {
+                    'title': title,
+                    'headers': dailydata.columns,
+                    'finaldata': dailydata.iterrows()
+                  })
 
 def entrance(request):
     daterange = boggedagain.rangeretrieval()

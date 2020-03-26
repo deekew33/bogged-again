@@ -2,7 +2,7 @@
   <!-- Container to center navbar contents -->
   <div class="container">
     <!-- Suit man logo with brand -->
-    <a class="navbar-brand" href="http://www.boggedaga.in"><i class="fas fa-user-tie mr-2"></i>Bogged Again!</a>
+    <a class="navbar-brand" href="{% url 'polls:ticker' %}"><i class="fas fa-user-tie mr-2"></i>Bogged Again!</a>
 
     <!-- Navbar toggler/hamburger for smaller screens sizes -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -13,16 +13,16 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" href="http://www.boggedaga.in">Home</a>
+          <a class="nav-link" href="{% url 'polls:ticker' %}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="http://www.boggedaga.in/dailybog">Daily Bog</a>
+          <a class="nav-link" href="{% url 'polls:bogged' %}">Daily Bog</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="http://www.boggedaga.in/entrance">Bogchives</a>
+          <a class="nav-link" href="{% url 'polls:entrance' %}">Bogchives</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="http://www.boggedaga.in/blog">Blog</a>
+          <a class="nav-link" href="{% url 'allblogs' %}">Blog</a>
         </li>
       </ul>
 

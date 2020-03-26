@@ -13,6 +13,17 @@ html {
     font-family: 'Raleway', sans-serif;
 }
 
+#body-error {
+  /* Daily Bog error.html styling */
+  /* Bogdanoff on a call */
+  background-image: url("https://i.ytimg.com/vi/TRXdxiot5JM/maxresdefault.jpg");
+
+  background-position: center;
+  background-size: cover;
+
+  font-family: 'Raleway', sans-serif;
+}
+
 .jumbotron {
     /* Transparent purple background */
     background-color: rgba(144, 132, 142, 0.5);

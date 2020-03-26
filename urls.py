@@ -6,7 +6,7 @@ from django.conf import settings
 import blog
 
 urlpatterns = [
-    path('', include('polls.urls')),
+    path('polls/', include('polls.urls')),
     path('admin/', admin.site.urls),
     path('blog/', views.allblogs, name='allblogs'),
     path('blog/<int:blog_id>/', views.detail, name="detail"),

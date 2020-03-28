@@ -1,92 +1,86 @@
-<head>
-<title> {{ticker}} data </title>
-    {% load static %}
-    <script src="{% static "sorttable.js" %}"></script>
-</head>
-<link href={% static "tabulator.min.css" %} rel="stylesheet">
-<link rel="stylesheet" href={% static "w3.css" %}>
-<header class="w3-container w3-red">
-  <h1>Bogged Again!</h1>
-</header>
-<div class="w3-sidebar w3-bar-block" style="width:15%">
-  <a href=http://www.boggedaga.in class="w3-bar-item w3-button">Home</a>
-  <a href=http://www.boggedaga.in/entrance class="w3-bar-item w3-button">The Bogchives</a>
-  <a href=http://www.boggedaga.in/dailybog class="w3-bar-item w3-button">The Daily Bog</a>
-      <a href=http://www.boggedaga.in/blog class="w3-bar-item w3-button">Blogged again</a>
-      <img src={% static "bogsidebar.png" %} alt="Header">
-</div>
+{% extends 'polls/base.html' %}
 
+{% block title %}{{ title }}{% endblock title %}
 
-<div class="table-controls" style="margin-left:15%">
-<center>
-<button id="del-row">Remove Selected Rows</button>
-<button id="reset">Reset</button>
-</center>
-</div>
-<div id="example-table" class="w3-container" style="margin-left:15%">
+{% block body_content %}
+<body id="body-bogging">
+  <!-- Navbar at top of page -->
+  {% include 'polls/top_navbar.html' %}
 
-</div>
-<script type="text/javascript" src={% static "jquery-3.4.1.js" %}></script>
-<script type="text/javascript" src={% static "jquery-ui.min.js" %}></script>
-<script src={% static "tabulator.min.js" %}></script>
-<script>
-{% autoescape off %}
-    var tabledata = {{json}};
-{% endautoescape %}
+  <div class="container">
+    <!-- Main header of page -->
+    <h1 class="display-3 text-center my-5">{{ title }}</h1>
 
-    var table = new Tabulator("#example-table", {
-        data:tabledata, //assign data to table
-        layout:"fitData", //fit columns to width of table (optional)
-        columns:[ //Define Table Columns
-            {formatter:"rowSelection", titleFormatter:"rowSelection", align:"center", headerSort:false,
-                cellClick:function(e, cell){cell.getRow().toggleSelect();}},
-            {title:"Date", field:"Date",  align:"center",},
-            {title:"Percent", field:"Percent",  align:"center",},
-            {title:"3 Day Percent", field:"3 Day Percent", align:"center", topCalc:"avg"},
-            {title:"3 Day Open Percent", field:"3 Day Open Percent", align:"center", topCalc:"avg"},
-            {title:"Headline", field:"Headline", align:"center",formatter:"link",formatterParams:{labelField: "Headline", urlField:'URL'}},
-            {title:"Category", field:"Category", align:"center",},
- 	        ],
-    });
+    <!-- Buttons for deleting rows/resetting rows in bogging-table -->
+    <div class="btn-group-sm table-controls d-flex justify-content-center my-4" role="group" aria-label="Buttons to remove selected rows and reset table">
+      <button type="button" id="del-row" class="btn btn-outline-danger mr-1">
+        Remove Selected Rows
+      </button>
 
-    $("#del-row").click(function(){
-    table.deleteRow(table.getSelectedRows());
-    });
+      <button type="button" id="reset" class="btn btn-outline-success">
+        Reset
+      </button>
+    </div>
 
-    $("#reset").click(function(){
-    table.setData(tabledata);
-    });
+    <!-- Table populated from bogging-table.js -->
+    <div id="bogging-table" class="table-sm table-striped table-bordered"></div>
 
-</script>
+    <!-- Statistics summary table  -->
+    <h3 class="text-center mt-5 mb-4">Statistics Summary</h4>
 
-<div class="w3-container" style="margin-left:15%">
-<center>
-    <p> Other data:</p>
-    <table border="1" class="sortable w3-table w3-bordered w3-striped">
-        <tr>
-            {% for item in statheaders %}
-                <th>{{item}}</th>
+    <div class="table-responsive text-center mb-5">
+      <table class="table table-sm table-bordered">
+        <thead class="thead-light">
+          <tr>
+            {% for header in statheaders %}
+            <th scope="col">{{ header }}</th>
             {% endfor %}
-        </tr>
-        {% for item, column in stats %}
-            {% for thing in column %}
-                {% cycle '<tr>' '' '' '' '' '' '' %}
-                    <td><center>
-                            {{thing}}
-                    </center></td>
-                {% cycle '' '' '' '' ''  '' '</tr>' %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item, column in stats %}
+            {% for val in column %}
+              {% cycle '<tr>' '' '' '' '' '' '' %}
+                <td>{{ val }}</td>
+              {% cycle '' '' '' '' '' '' '</tr>' %}
             {% endfor %}
-        {% endfor %}
-    </table>
-</center>
-</div>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
 
-<div class="w3-container" style="margin-left:15%">
-<center>
-<p>Try again? </p>
-<form action='/bogging/'>
-    <textarea name="ticker" cols=5 rows=3></textarea>
-    <input type="submit" value="Submit">
-</form>
-</center>
-</div>
+  </div>
+
+  <!-- Bootstrap Scripts -->
+  {% include 'polls/bootstrap_scripts.html' %}
+  
+  {% load static %}
+
+  <!-- Script to enable/display top navbar ticker search -->
+  <script src="{% static 'js/enable_top_navbar_search.js' %}"></script>
+
+  <!-- Script for Tabulator -->
+  <script src="{% static 'js/tabulator.min.js' %}"></script>
+
+  <!-- Script for sorting table -->
+  <script src="{% static 'js/sorttable.js' %}"></script>
+
+  <!-- Global variable for JSON object used in bogging-table.js -->
+  <script type="text/javascript">
+    // {% autoescape off %}
+      const tabledata = {{ json | safe }}
+    // {% endautoescape %}
+  </script>
+
+  <!-- Script to populate bogging-table -->
+  <script src="{% static 'js/bogging-table.js' %}"></script>
+
+  <!-- Center header text of bogging-table -->
+  <style type="text/css">
+    .tabulator .tabulator-header .tabulator-col {
+      text-align:center;
+    }
+  </style>
+
+</body>
+{% endblock body_content %}

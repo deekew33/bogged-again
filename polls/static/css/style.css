@@ -1,16 +1,22 @@
 html {
-    /* Background image (if used) will occupy 100% of window height */
-    height: 100%;
+  /* Background image (if used) will occupy 100% of window height */
+  height: 100%;
+}
+
+body {
+  font-family: 'Raleway', sans-serif;
+}
+
+#navbar-top {
+  background-color: #2c3f48;
 }
 
 #body-index {
-    /* Photo by Elvis Bekmanis on Unsplash */
-    background-image: url("https://images.unsplash.com/photo-1556805004-144cdda5da89?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1933&q=80");
+  /* Photo by Elvis Bekmanis on Unsplash */
+  background-image: url("https://images.unsplash.com/photo-1556805004-144cdda5da89?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1933&q=80");
 
-    background-position: center;
-    background-size: cover;
-
-    font-family: 'Raleway', sans-serif;
+  background-position: center;
+  background-size: cover;
 }
 
 #body-error {
@@ -20,18 +26,16 @@ html {
 
   background-position: center;
   background-size: cover;
-
-  font-family: 'Raleway', sans-serif;
 }
 
 .jumbotron {
-    /* Transparent purple background */
-    background-color: rgba(144, 132, 142, 0.7);
+  /* Transparent purple background */
+  background-color: rgba(144, 132, 142, 0.7);
 
-    /* White text color */
-    color: white;
-    text-align: center;
+  /* White text color */
+  color: white;
+  text-align: center;
 
-    /* Margin so jumbotron is near middle of page */
-    margin-top: 15%;
+  /* Margin so jumbotron is near middle of page */
+  margin-top: 15%;
 }

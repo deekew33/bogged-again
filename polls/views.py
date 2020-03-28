@@ -13,8 +13,8 @@ else: #we're on the linux server
     lpath = '/stuff/ebdjango/'
 
 def bogging(request):
-    title = "Daily Bog"
     ticker = request.GET['ticker'].upper()
+    title = ticker + " Data"
     starttime = time.strftime("%Y%m%d",time.gmtime(time.time()-60*60*24*365*2))
     requested = boggedagain.extract_quote(ticker, starttime)
     if not isinstance(requested, str):
@@ -33,10 +33,10 @@ def bogging(request):
     return render(request,
                   'polls/bogging.html',
                   {
-                    'ticker':ticker,
-                    'statheaders':stats.columns,
-                    'stats':stats.iterrows(),
-                    'json':requestjson
+                    'title': title,
+                    'statheaders': stats.columns,
+                    'stats': stats.iterrows(),
+                    'json': requestjson
                   })
 
 def input(request):

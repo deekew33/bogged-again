@@ -1,46 +1,81 @@
-<head>
-<title> Final data </title>
-    {% load static %}
-    <script src="{% static 'js/sorttable.js' %}"></script>
-    <link rel="stylesheet" href={% static "w3.css" %}>
-</head>
-<header class="w3-container w3-gray">
-  <h1>The Bogchives</h1>
-</header>
-<div class="w3-sidebar w3-bar-block" style="width:15%">
-  <a href=http://www.boggedaga.in class="w3-bar-item w3-button">Home</a>
-  <a href=http://www.boggedaga.in/entrance class="w3-bar-item w3-button">The Bogchives</a>
-  <a href=http://www.boggedaga.in/dailybog class="w3-bar-item w3-button">The Daily Bog</a>
-      <a href=http://www.boggedaga.in/blog class="w3-bar-item w3-button">Blogged again</a>
-          <img src={% static "bogsidebar.png" %} alt="Header" class="w3-grayscale-max">
-</div>
+{% extends 'polls/base.html' %}
 
+{% block head_content %}
+{% load static %}
 
-<div class="w3-container" style="margin-left:15%">
-<center>
-<p> Click on the column name to sort! </p>
-<table border="1" class="sortable w3-table w3-bordered w3-striped">
- {% if ensemble.0 > 0%}
-    <tr class="w3-green">
+<!-- Script for sorting table --> 
+<script src="{% static 'js/sorttable.js' %}"></script>
+{% endblock head_content %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block body_content %}
+<body id="body-bogchives">
+  <!-- Navbar at top of page -->
+  {% include 'polls/top_navbar.html' %}
+
+  <!-- Jumbotron header at top of page -->
+  <div class="jumbotron jumbotron-fluid mb-4" id="jumbotron-entrance">
+    <div class="container">
+      <h1 class="display-4">{{ title }}</h1>
+    </div>
+  </div>
+
+  <div class="container">
+    <h3 class="text-center py-3">Performance summary for {{ date }}</h3>
+
+    <p>If you bought all of these evenly, your net percent change would be {{ ensemble.0 }}.</p>
+    <p>If you bought in only those of rank 1k+, your net percent change would be {{ ensemble.2 }}</p>
+    <p class="pb-5">If you bought the top ten in ranking, your net percent change would be {{ ensemble.1 }}</p>
+
+    <!-- Table of stock performance -->
+    <div class="table-responsive text-center mb-5" data-toggle="tooltip" data-placement="top" title="Click on a column name to sort">
+      <table class="table table-sm table-bordered table-striped sortable">
+        <thead>
+          <tr>
+            {% for header in headers %}
+            <th scope="col">{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item, column in finaldata %}
+            {% for val in column %}
+              {% cycle '<tr>' '' '' '' '' '' '' '' '' '' '' '' %}
+                <td>{{ val }}</td>
+              {% cycle '' '' '' '' '' '' '' '' '' '' '' '</tr>' %}
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap Scripts -->
+  {% include 'polls/bootstrap_scripts.html' %}
+  
+  {% load static %}
+
+  <!-- Script to enable/display top navbar ticker search -->
+  <script src="{% static 'js/enable_top_navbar_search.js' %}"></script>
+
+  <!-- Script to set color of table head and enable tooltip -->
+  <script type="text/javascript">
+    const even_net_change = {{ ensemble.0 }};
+
+    {% if even_net_change > 0 %}
+      $("thead").addClass("bg-success");
     {% else %}
-    <tr class="w3-red">
-    {%endif %}
-    {% for item in headers %}
-        <th>{{item}}</th>
-    {% endfor %}
-    </tr>
-    {% for item, column in finaldata %}
-        {% for thing in column %}
-            {% cycle '<tr>' '' '' '' '' '' '' '' '' '' '' ''%}
-                <td><center>
-                        {{thing}}
-                </center></td>
-            {% cycle '' '' '' '' '' '' '' '' '' '' '' '</tr>' %}
-        {% endfor %}
-    {% endfor %}
-</table>
-<p> If you bought all of these evenly, your net percent change would be {{ensemble.0}}.</p>
-<p>If you bought in only those of rank 1k+, your net percent change would be  {{ensemble.2}}</p>
-<p>If you bought the top ten in ranking, your net percent change would be  {{ensemble.1}}</p>
-</center>
-</div>
+      $("thead").addClass("bg-danger");
+    {% endif %}
+
+    $('.table-responsive').tooltip('show', {
+      animation: true,
+      boundary: 'window',
+      trigger: 'manual'
+    });
+  </script>
+
+</body>
+{% endblock body_content %}

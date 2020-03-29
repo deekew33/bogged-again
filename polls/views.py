@@ -100,9 +100,14 @@ def entrance(request):
 
 def bogchives(request):
     date = request.GET['date']
+    title = "Bogchives " + date
     bogchive = boggedagain.archiveretrieval(date)
     if isinstance(bogchive, str):
-        return render(request, 'polls/error.html', {'error': bogchive})
+        return render(request,
+                      'polls/error.html',
+                      {
+                          'error': bogchive
+                      })
     else:
         ensemble = [0]*3
         try:
@@ -121,8 +126,15 @@ def bogchives(request):
             connection.commit()
             connection.close()
 
-        return render(request, 'polls/bogchives.html', {'headers': bogchive.columns,
-                                                    'finaldata': bogchive.iterrows(),'ensemble':ensemble})
+        return render(request,
+                      'polls/bogchives.html',
+                      {
+                          'title': title,
+                          'date': date,
+                          'headers': bogchive.columns,
+                          'finaldata': bogchive.iterrows(),
+                          'ensemble':ensemble
+                      })
 
 def bloggedagain(request):
     return render(request,'polls/blog.html')

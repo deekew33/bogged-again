@@ -23,8 +23,8 @@ def bogging(request):
         return render(request,
                       'polls/error.html',
                       {
-                        'title': title,
-                        'error': requested
+                          'title': title,
+                          'error': requested
                       })
     else:
         stats = boggedagain.createstat(requested, ticker)
@@ -33,10 +33,10 @@ def bogging(request):
     return render(request,
                   'polls/bogging.html',
                   {
-                    'title': title,
-                    'statheaders': stats.columns,
-                    'stats': stats.iterrows(),
-                    'json': requestjson
+                      'title': title,
+                      'statheaders': stats.columns,
+                      'stats': stats.iterrows(),
+                      'json': requestjson
                   })
 
 def input(request):
@@ -56,34 +56,47 @@ def dailybog(request):
         return render(request,
                       'polls/error.html',
                       {
-                        'title': title,
-                        'error': dailydata
+                          'title': title,
+                          'error': dailydata
                       })
     return render(request,
                   'polls/dailybog.html',
                   {
-                    'title': title,
-                    'headers': dailydata.columns,
-                    'finaldata': dailydata.iterrows()
+                      'title': title,
+                      'headers': dailydata.columns,
+                      'finaldata': dailydata.iterrows()
                   })
 
 def entrance(request):
+    title = "Bogchives"
     daterange = boggedagain.rangeretrieval()
     connection = sqlite3.connect(f"{lpath}results.db")
     cursor = connection.cursor()
     result = cursor.execute("SELECT * FROM 'Archives' ORDER BY time DESC LIMIT 20").fetchall()
-    headers=['Date','All stocks','Top 10 Rank','Rank 1k+']
-    performance = {'all':0, 'top10':0,'rank1k':0}
+
+    headers = ['Date', 'All stocks', 'Top 10 Rank', 'Rank 1k+']
+    performance = {'all':0, 'top10':0, 'rank1k':0}
+
     for thing in result:
-        performance['all']+= thing[1]
+        performance['all'] += thing[1]
         performance['top10'] += thing[2]
         performance['rank1k'] += thing[3]
+    
     performance['all'] = math.ceil(performance['all']/len(result)*100)/100
-    performance['top10'] = math.ceil(performance['top10'] / len(result) * 100) / 100
-    performance['rank1k'] = math.ceil(performance['rank1k'] / len(result) * 100) / 100
+    performance['top10'] = math.ceil(performance['top10']/len(result)*100)/100
+    performance['rank1k'] = math.ceil(performance['rank1k']/len(result)*100)/100
+
     connection.close()
-    return render(request,'polls/entrance.html',{'mindate':daterange[0][0], 'performance':performance,
-                                                 'maxdate':daterange[0][1], 'headers':headers, 'results':result})
+    return render(request,
+                  'polls/entrance.html',
+                  {
+                      'title': title,
+                      'mindate': daterange[0][0],
+                      'performance': performance,
+                      'maxdate': daterange[0][1],
+                      'headers': headers,
+                      'results': result
+                  })
 
 def bogchives(request):
     date = request.GET['date']

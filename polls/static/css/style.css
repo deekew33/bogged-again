@@ -29,13 +29,23 @@ body {
 }
 
 .jumbotron {
-  /* Transparent purple background */
-  background-color: rgba(144, 132, 142, 0.7);
-
   /* White text color */
   color: white;
   text-align: center;
+}
+
+.jumbotron-floating {
+  /* Transparent purple background */
+  background-color: rgba(144, 132, 142, 0.7);
 
   /* Margin so jumbotron is near middle of page */
   margin-top: 15%;
+}
+
+#jumbotron-entrance {
+  /* Photo by Mario Klassen on Unsplash */
+  background-image: url("https://images.unsplash.com/photo-1520796387691-908042da287d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80");
+
+  background-position: center;
+  background-size: cover;
 }

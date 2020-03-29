@@ -1,5 +1,19 @@
 {% extends 'polls/base.html' %}
 
+{% block head_content %}
+{% load static %}
+
+<!-- Tabulator Bootstrap CSS -->
+<link rel="stylesheet" href="{% static 'css/tabulator_bootstrap4.min.css' %}" type="text/css">
+
+<!-- Center header text of bogging-table -->
+<style type="text/css">
+  .tabulator .tabulator-header .tabulator-col {
+    text-align:center;
+  }
+</style>
+{% endblock head_content %}
+
 {% block title %}{{ title }}{% endblock title %}
 
 {% block body_content %}
@@ -62,9 +76,6 @@
   <!-- Script for Tabulator -->
   <script src="{% static 'js/tabulator.min.js' %}"></script>
 
-  <!-- Script for sorting table -->
-  <script src="{% static 'js/sorttable.js' %}"></script>
-
   <!-- Global variable for JSON object used in bogging-table.js -->
   <script type="text/javascript">
     // {% autoescape off %}
@@ -74,13 +85,6 @@
 
   <!-- Script to populate bogging-table -->
   <script src="{% static 'js/bogging-table.js' %}"></script>
-
-  <!-- Center header text of bogging-table -->
-  <style type="text/css">
-    .tabulator .tabulator-header .tabulator-col {
-      text-align:center;
-    }
-  </style>
-
+  
 </body>
 {% endblock body_content %}

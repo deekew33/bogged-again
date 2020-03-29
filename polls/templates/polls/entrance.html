@@ -1,4 +1,89 @@
-<head>
+{% extends 'polls/base.html' %}
+
+{% block head_content %}
+{% load static %}
+
+<!-- Script for sorting table -->
+<script src="{% static 'js/sorttable.js' %}"></script>
+
+<!-- Tabulator Bootstrap CSS -->
+<link rel="stylesheet" href="{% static 'css/tabulator_bootstrap4.min.css' %}" type="text/css">
+
+<!-- Center header text of bogging-table -->
+<style type="text/css">
+  .tabulator .tabulator-header .tabulator-col {
+    text-align:center;
+  }
+</style>
+{% endblock head_content %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block body_content %}
+<body id="body-entrance">
+  <!-- Navbar at top of page -->
+  {% include 'polls/top_navbar.html' %}
+
+  <!-- Jumbotron header at top of page -->
+  <div class="jumbotron jumbotron-fluid mb-4" id="jumbotron-entrance">
+    <div class="container">
+      <h1 class="display-4">The {{ title }}</h1>
+    </div>
+  </div>
+
+  <div class="container">
+    <p class="lead text-center py-3">Welcome to the archives of stock analyses spanning records from <a href="http://www.boggedaga.in/bogchives/?date={{mindate}}" target="_blank" rel="noreferrer noopener">{{ mindate }}</a> to <a href="http://www.boggedaga.in/bogchives/?date={{maxdate}}" target="_blank" rel="noreferrer noopener">{{ maxdate }}</a>. Select a date below to view the corresponding records:</p>
+
+
+
+
+    <!-- Statistics summary table  -->
+    <!-- <h3 class="text-center mt-5 mb-4">Statistics Summary</h4>
+
+    <div class="table-responsive text-center mb-5">
+      <table class="table table-sm table-bordered">
+        <thead class="thead-light">
+          <tr>
+            {% for header in statheaders %}
+            <th scope="col">{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item, column in stats %}
+            {% for val in column %}
+              {% cycle '<tr>' '' '' '' '' '' '' %}
+                <td>{{ val }}</td>
+              {% cycle '' '' '' '' '' '' '</tr>' %}
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div> -->
+
+  </div>
+
+  <!-- Bootstrap Scripts -->
+  {% include 'polls/bootstrap_scripts.html' %}
+  
+  {% load static %}
+
+  <!-- Script to enable/display top navbar ticker search -->
+  <script src="{% static 'js/enable_top_navbar_search.js' %}"></script>
+
+  <!-- Script for Tabulator -->
+  <script src="{% static 'js/tabulator.min.js' %}"></script>
+
+</body>
+{% endblock body_content %}
+
+
+
+
+
+
+
+<!-- <head>
 <title> The Bogchives </title>
 </head>
 {% load static %}
@@ -69,4 +154,4 @@ To give you some idea of what date to try, the oldest date we have is
 
 </table>
 </center>
-</div>
+</div> -->

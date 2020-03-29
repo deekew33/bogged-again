@@ -100,7 +100,7 @@ def entrance(request):
 
 def bogchives(request):
     date = request.GET['date']
-    title = "Bogchives " + date
+    title = "Bogchives"
     bogchive = boggedagain.archiveretrieval(date)
     if isinstance(bogchive, str):
         return render(request,

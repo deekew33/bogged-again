@@ -9,10 +9,28 @@
 <!-- Tabulator Bootstrap CSS -->
 <link rel="stylesheet" href="{% static 'css/tabulator_bootstrap4.min.css' %}" type="text/css">
 
-<!-- Center header text of bogging-table -->
+<!-- Additional styling of bogging-table -->
 <style type="text/css">
+  /* Center header text of bogging-table */
   .tabulator .tabulator-header .tabulator-col {
     text-align:center;
+  }
+
+  /* Change selected row color */
+  .tabulator-row.tabulator-selected {
+    background-color: #eaa09a;
+  }
+  
+  .tabulator-row.tabulator-selected:hover {
+    background-color: #cc7c76;
+  }
+
+  .tabulator.table-striped .tabulator-row:nth-child(2n).tabulator-selected {
+    background-color: #eaa09a;
+  }
+
+  .tabulator.table-striped .tabulator-row:nth-child(2n).tabulator-selected:hover {
+    background-color: #cc7c76;
   }
 </style>
 {% endblock head_content %}

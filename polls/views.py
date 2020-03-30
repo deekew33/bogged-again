@@ -16,8 +16,8 @@ def index(request):
     title = "Bogged Again!"
 
     return render(request, 'polls/index.html', {'title': title})
-    
-def bogging(request):
+
+def analyzenews(request):
     ticker = request.GET['ticker'].upper()
     title = ticker + " Data"
     starttime = time.strftime("%Y%m%d",time.gmtime(time.time()-60*60*24*365*2))
@@ -36,7 +36,7 @@ def bogging(request):
         #requested = requested.set_index('URL')
     requestjson = requested.to_json(orient='records')
     return render(request,
-                  'polls/bogging.html',
+                  'polls/analyzenews.html',
                   {
                       'title': title,
                       'statheaders': stats.columns,

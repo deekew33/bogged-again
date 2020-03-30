@@ -1,6 +1,6 @@
-// This script populates bogging-table with data in polls/bogging.html
+// This script populates analyzenews-table with data in polls/analyzenews.html
 
-var bogging_table = new Tabulator("#bogging-table",
+var analyzenews_table = new Tabulator("#analyzenews-table",
   {
     data:tabledata,          // Assign data to table
     layout:"fitDataStretch", // Fit columns to width of table, stretch last col
@@ -17,9 +17,9 @@ var bogging_table = new Tabulator("#bogging-table",
   });
 
 $("#del-row").click(() => {
-  bogging_table.deleteRow(bogging_table.getSelectedRows());
+  analyzenews_table.deleteRow(analyzenews_table.getSelectedRows());
 });
 
 $("#reset").click(() => {
-  bogging_table.setData(tabledata);
+  analyzenews_table.setData(tabledata);
 });

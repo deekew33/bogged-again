@@ -6,9 +6,9 @@
 <!-- Tabulator Bootstrap CSS -->
 <link rel="stylesheet" href="{% static 'css/tabulator_bootstrap4.min.css' %}" type="text/css">
 
-<!-- Additional styling of bogging-table -->
+<!-- Additional styling of analyzenews-table -->
 <style type="text/css">
-  /* Center header text of bogging-table */
+  /* Center header text of analyzenews-table */
   .tabulator .tabulator-header .tabulator-col {
     text-align:center;
   }
@@ -35,7 +35,7 @@
 {% block title %}{{ title }}{% endblock title %}
 
 {% block body_content %}
-<body id="body-bogging">
+<body id="body-analyzenews">
   <!-- Navbar at top of page -->
   {% include 'polls/top_navbar.html' %}
 
@@ -43,7 +43,7 @@
     <!-- Main header of page -->
     <h1 class="display-3 text-center my-5">{{ title }}</h1>
 
-    <!-- Buttons for deleting rows/resetting rows in bogging-table -->
+    <!-- Buttons for deleting rows/resetting rows in analyzenews-table -->
     <div class="btn-group-sm table-controls d-flex justify-content-center my-4" role="group" aria-label="Buttons to remove selected rows and reset table">
       <button type="button" id="del-row" class="btn btn-outline-danger mr-1">
         Remove Selected Rows
@@ -54,8 +54,8 @@
       </button>
     </div>
 
-    <!-- Table populated from bogging-table.js -->
-    <div id="bogging-table" class="table-sm table-striped table-bordered"></div>
+    <!-- Table populated from analyzenews-table.js -->
+    <div id="analyzenews-table" class="table-sm table-striped table-bordered"></div>
 
     <!-- Statistics summary table  -->
     <h3 class="text-center mt-5 mb-4">Statistics Summary</h3>
@@ -94,15 +94,15 @@
   <!-- Script for Tabulator -->
   <script src="{% static 'js/tabulator.min.js' %}"></script>
 
-  <!-- Global variable for JSON object used in bogging-table.js -->
+  <!-- Global variable for JSON object used in analyzenews-table.js -->
   <script type="text/javascript">
     // {% autoescape off %}
       const tabledata = {{ json | safe }}
     // {% endautoescape %}
   </script>
 
-  <!-- Script to populate bogging-table -->
-  <script src="{% static 'js/bogging-table.js' %}"></script>
+  <!-- Script to populate analyzenews-table -->
+  <script src="{% static 'js/analyzenews-table.js' %}"></script>
   
 </body>
 {% endblock body_content %}

@@ -132,6 +132,3 @@ def selectbogchive(request):
                           'finaldata': bogchive.iterrows(),
                           'ensemble':ensemble
                       })
-
-def bloggedagain(request):
-    return render(request,'polls/blog.html')

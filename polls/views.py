@@ -12,6 +12,11 @@ if not os.path.exists('/stuff/venvs/python36'):
 else: #we're on the linux server
     lpath = '/stuff/ebdjango/'
 
+def index(request):
+    title = "Bogged Again!"
+
+    return render(request, 'polls/index.html', {'title': title})
+    
 def bogging(request):
     ticker = request.GET['ticker'].upper()
     title = ticker + " Data"
@@ -38,15 +43,6 @@ def bogging(request):
                       'stats': stats.iterrows(),
                       'json': requestjson
                   })
-
-def input(request):
-    title = "Bogged Again!"
-
-    # Homepage built with Bootstrap 4
-    return render(request, 'polls/index.html', {'title': title})
-
-    # Original homepage
-    # return render(request, 'polls/input.html')
 
 def dailybog(request):
     title = "Daily Bog"

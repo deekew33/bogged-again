@@ -2,7 +2,7 @@
   <!-- Container to center navbar contents -->
   <div class="container">
     <!-- Suit man logo with brand -->
-    <a class="navbar-brand" href="{% url 'polls:ticker' %}"><i class="fas fa-user-tie fa-lg mr-2"></i>Bogged Again!</a>
+    <a class="navbar-brand" href="{% url 'polls:index' %}"><i class="fas fa-user-tie fa-lg mr-2"></i>Bogged Again!</a>
 
     <!-- Navbar toggler/hamburger for smaller screens sizes -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -13,7 +13,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'polls:ticker' %}">Home</a>
+          <a class="nav-link" href="{% url 'polls:index' %}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{% url 'polls:bogged' %}">Daily Bog</a>

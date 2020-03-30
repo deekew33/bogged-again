@@ -10,7 +10,7 @@
 {% block title %}{{ title }}{% endblock title %}
 
 {% block body_content %}
-<body id="body-entrance">
+<body id="body-bogchives">
   <!-- Navbar at top of page -->
   {% include 'polls/top_navbar.html' %}
 
@@ -31,9 +31,9 @@
           <span class="input-group-text"><i class="fa fa-calendar"></i></span>
         </div>
 
-        <label for="entrance-datepicker" class="sr-only">Date picker</label>
+        <label for="bogchives-datepicker" class="sr-only">Date picker</label>
 
-        <input type="text" name="date" class="form-control datetimepicker-input" id="entrance-datepicker" data-toggle="datetimepicker" data-target="#entrance-datepicker" aria-label="Select date"/>
+        <input type="text" name="date" class="form-control datetimepicker-input" id="bogchives-datepicker" data-toggle="datetimepicker" data-target="#bogchives-datepicker" aria-label="Select date"/>
 
         <div class="input-group-append">
           <button class="btn btn-primary" type="submit">
@@ -116,7 +116,7 @@
 
   <script type="text/javascript">
     $(() => {
-        $('#entrance-datepicker').datetimepicker({
+        $('#bogchives-datepicker').datetimepicker({
             format: 'YYYY-MM-DD',
             daysOfWeekDisabled: [0, 6],
             minDate: '{{ mindate }}',

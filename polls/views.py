@@ -63,7 +63,7 @@ def dailybog(request):
                       'finaldata': dailydata.iterrows()
                   })
 
-def entrance(request):
+def bogchives(request):
     title = "Bogchives"
     daterange = boggedagain.rangeretrieval()
     connection = sqlite3.connect(f"{lpath}results.db")
@@ -84,7 +84,7 @@ def entrance(request):
 
     connection.close()
     return render(request,
-                  'polls/entrance.html',
+                  'polls/bogchives.html',
                   {
                       'title': title,
                       'mindate': daterange[0][0],

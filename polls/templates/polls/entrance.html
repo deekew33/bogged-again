@@ -15,17 +15,17 @@
   {% include 'polls/top_navbar.html' %}
 
   <!-- Jumbotron header at top of page -->
-  <div class="jumbotron jumbotron-fluid mb-4" id="jumbotron-entrance">
+  <div class="jumbotron jumbotron-fluid jumbotron-bogchives mb-4">
     <div class="container">
       <h1 class="display-4">The {{ title }}</h1>
     </div>
   </div>
 
   <div class="container">
-    <p class="lead text-center py-3">Welcome to the archives of stock analyses spanning from <a href="http://www.boggedaga.in/bogchives/?date={{ mindate }}" target="_blank" rel="noreferrer noopener">{{ mindate }}</a> to <a href="http://www.boggedaga.in/bogchives/?date={{ maxdate }}" target="_blank" rel="noreferrer noopener">{{ maxdate }}</a>. Select a date below to view the corresponding records:</p>
+    <p class="lead text-center py-3">Welcome to the archives of stock analyses spanning from <a href="http://www.boggedaga.in/selectbogchive/?date={{ mindate }}" target="_blank" rel="noreferrer noopener">{{ mindate }}</a> to <a href="http://www.boggedaga.in/selectbogchive/?date={{ maxdate }}" target="_blank" rel="noreferrer noopener">{{ maxdate }}</a>. Select a date below to view the corresponding records:</p>
 
     <!-- Form for selecting date -->
-    <form action="{% url 'polls:bogchives' %}" class="d-flex justify-content-center align-items-center mb-3">
+    <form action="{% url 'polls:selectbogchive' %}" class="d-flex justify-content-center align-items-center mb-3">
       <div class="input-group col-md-7 col-lg-5 mb-3">
         <div class="input-group-prepend">
           <span class="input-group-text"><i class="fa fa-calendar"></i></span>
@@ -61,7 +61,7 @@
               {% cycle '<tr>' '' '' '' %}
                 {% if val|length > 3 %}
                   <td>
-                    <a href="http://www.boggedaga.in/bogchives/?date={{ val }}" target="_blank" rel="noreferrer noopener">
+                    <a href="http://www.boggedaga.in/selectbogchive/?date={{ val }}" target="_blank" rel="noreferrer noopener">
                       {{ val }}
                     </a>
                   </td>

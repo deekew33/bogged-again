@@ -7,17 +7,17 @@
 <script src="{% static 'js/sorttable.js' %}"></script>
 {% endblock head_content %}
 
-{% block title %}{{ title }}: {{ date }}{% endblock title %}
+{% block title %}{{ title }}{% endblock title %}
 
 {% block body_content %}
-<body id="body-bogchives">
+<body id="body-selectbogchive">
   <!-- Navbar at top of page -->
   {% include 'polls/top_navbar.html' %}
 
   <!-- Jumbotron header at top of page -->
-  <div class="jumbotron jumbotron-fluid mb-4" id="jumbotron-entrance">
+  <div class="jumbotron jumbotron-fluid jumbotron-bogchives mb-4">
     <div class="container">
-      <h1 class="display-4">The {{ title }}: {{ date }}</h1>
+      <h1 class="display-4">{{ title }}</h1>
     </div>
   </div>
 

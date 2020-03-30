@@ -42,7 +42,7 @@ body {
   margin-top: 15%;
 }
 
-#jumbotron-entrance {
+.jumbotron-bogchives {
   /* Photo by Mario Klassen on Unsplash */
   background-image: url("https://images.unsplash.com/photo-1520796387691-908042da287d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80");
 

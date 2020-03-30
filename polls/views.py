@@ -94,14 +94,15 @@ def entrance(request):
                       'results': result
                   })
 
-def bogchives(request):
+def selectbogchive(request):
     date = request.GET['date']
-    title = "Bogchives"
+    title = "Bogchive: " + date
     bogchive = boggedagain.archiveretrieval(date)
     if isinstance(bogchive, str):
         return render(request,
                       'polls/error.html',
                       {
+                          'title': title,
                           'error': bogchive
                       })
     else:
@@ -123,7 +124,7 @@ def bogchives(request):
             connection.close()
 
         return render(request,
-                      'polls/bogchives.html',
+                      'polls/selectbogchive.html',
                       {
                           'title': title,
                           'date': date,

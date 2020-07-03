@@ -10,15 +10,25 @@
 {% block title %}{{ title }}{% endblock title %}
 
 {% block body_content %}
-<body id="body-dailybog">
+<body id="body-selectbogchive">
   <!-- Navbar at top of page -->
   {% include 'polls/top_navbar.html' %}
 
-  <!-- Main header of page -->
-  <h1 class="display-3 text-center my-5">{{ title }}</h1>
+  <!-- Jumbotron header at top of page -->
+  <div class="jumbotron jumbotron-fluid jumbotron-bogchives mb-4">
+    <div class="container">
+      <h1 class="display-4">{{ title }}</h1>
+    </div>
+  </div>
 
-  <div class="container pt-3">
-    <!-- Dailybog table -->
+  <div class="container">
+    <h3 class="text-center py-3">Performance summary for {{ date }}</h3>
+
+    <p>If you bought all of these evenly, your net percent change would be {{ ensemble.0 }}.</p>
+    <p>If you bought in only those of rank 1k+, your net percent change would be {{ ensemble.2 }}</p>
+    <p class="pb-5">If you bought the top ten in ranking, your net percent change would be {{ ensemble.1 }}</p>
+
+    <!-- Table of stock performance -->
     <div class="table-responsive text-center mb-5" data-toggle="tooltip" data-placement="top" title="Click on a column name to sort">
       <table class="table table-sm table-bordered table-striped sortable">
         <thead>
@@ -31,15 +41,9 @@
         <tbody>
           {% for item, column in finaldata %}
             {% for val in column %}
-              {% cycle '<tr>' '' '' '' '' '' '' '' '' '' '' %}
-                <td>
-                  {% if val|length < 5 and "." not in val %}
-                    <a href= "http://www.boggedaga.in/analyzenews?ticker={{ val }}" target="_blank" rel="noreferrer noopener">{{ val }}</a>
-                  {% else %}
-                    {{ val }}
-                  {% endif %}
-                </td>
-              {% cycle '' '' '' '' '' '' '' '' '' '' '</tr>' %}
+              {% cycle '<tr>' '' '' '' '' '' '' '' '' '' '' '' %}
+                <td>{{ val }}</td>
+              {% cycle '' '' '' '' '' '' '' '' '' '' '' '</tr>' %}
             {% endfor %}
           {% endfor %}
         </tbody>
@@ -56,8 +60,16 @@
   <!-- Script to enable/display top navbar ticker search -->
   <script src="{% static 'js/enable_top_navbar_search.js' %}"></script>
 
-  <!-- Script to enable tooltip -->
+  <!-- Script to set color of table head and enable tooltip -->
   <script type="text/javascript">
+    const even_net_change = {{ ensemble.0 }};
+
+    {% if even_net_change > 0 %}
+      $("thead").addClass("bg-success");
+    {% else %}
+      $("thead").addClass("bg-danger");
+    {% endif %}
+
     $('.table-responsive').tooltip('show', {
       animation: true,
       boundary: 'window',

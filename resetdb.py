@@ -7,7 +7,7 @@ tablenames = cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
 # the elements in the list are in the form of a tuple:
 tablelist = []
 for name in tablenames:
-    if '20' not in name[0] and 'Daily' not in name[0] and 'Archives' not in name[0]:
+    if '20' not in name[0] and 'Daily' not in name[0] and 'Archives' not in name[0] and "Stock" not in name[0]:
         tablelist.append(name[0])
 print(tablelist)
 for name in tablelist:

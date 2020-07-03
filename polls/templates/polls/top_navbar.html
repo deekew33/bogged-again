@@ -1,0 +1,66 @@
+<nav class="navbar navbar-expand-lg navbar-dark" id="navbar-top">
+  <!-- Container to center navbar contents -->
+  <div class="container">
+    <!-- Suit man logo with brand -->
+    <a class="navbar-brand" href="{% url 'polls:index' %}"><i class="fas fa-user-tie fa-lg mr-2"></i>Bogged Again!</a>
+
+    <!-- Navbar toggler/hamburger for smaller screens sizes -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'polls:index' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'polls:dailybog' %}">Daily Bog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'polls:bogchives' %}">Bogchives</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'allblogs' %}">Blog</a>
+        </li>
+      </ul>
+
+      <!-- Toggler/hamburger dropdown divider between left and right side links -->
+      <div class="dropdown-divider d-block d-lg-none"></div>
+
+      <!-- Form for submitting ticker symbol (default hidden/disabled) -->
+      <form action="{% url 'polls:analyzenews' %}" class="form-inline d-none mr-lg-2">
+        <label for="navbar-ticker-input" class="sr-only">TICKER SYMBOL</label>
+
+        <div class="input-group input-group-sm justify-content-end">
+          <input type="search" name="ticker" class="form-control" id="navbar-ticker-input" placeholder="TICKER SYMBOL" aria-label="TICKER SYMBOL">
+
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="submit">
+              <i class="fas fa-search fa-lg fa-fw"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Navbar right: External links (GitHub, YouTube, etc.) -->
+      <!-- Text-only until lg screen size then logo-only for larger screens -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/deekew33/bogged-again" target="_blank" rel="noreferrer noopener">
+            <p class="d-inline d-lg-none">GitHub</p>
+            <i class="fab fa-github fa-lg d-none d-lg-inline"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="https://youtu.be/61Q6wWu5ziY"  target="_blank" rel="noreferrer noopener">
+            <p class="d-inline d-lg-none">YouTube</p>
+            <i class="fab fa-youtube fa-lg d-none d-lg-inline"></i>
+          </a>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</nav>

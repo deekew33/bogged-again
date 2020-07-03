@@ -9,7 +9,7 @@ Given a ticker that is currently in the red, Bogged Again! searches through the 
 
 Bogged Again! will skip analysis of a given ticker if the stock was in the positive today or if similar movement has been observed at least 100 times over the last two years (roughly 500 business days).
 
-[The Bogchives](http://www.boggedaga.in/entrance/) is an archive of the past stock records.
+[The Bogchives](http://www.boggedaga.in/bogchives/) is an archive of the past stock records.
 
 
 ## Prerequisites

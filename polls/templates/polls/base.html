@@ -1,0 +1,78 @@
+{% load static %}
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-161884357-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+    
+      gtag('config', 'UA-161884357-1');
+    </script>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- For CMS/SEO -->
+    <meta name="author" content="Daniel Qiu, Jeffry Lew">
+    <meta name="description" content="Bogged Again! is a python-based service that provides quantitative insight into the adage, 'Buy low, sell high.'">
+
+    <!-- Facebook card -->
+    <!-- TODO: Figure out how to get Bogdanoff image with no-restrictions license -->
+    <meta property="og:site_name" content="Bogged Again!">
+    <meta property="og:url" content="http://boggedaga.in/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Bogged Again!">
+    <meta property="og:description" content="Bogged Again! is a python-based service that provides quantitative insight into the adage, 'Buy low, sell high.'">
+    <meta property="og:image" content="https://i.ytimg.com/vi/TRXdxiot5JM/maxresdefault.jpg">
+    <meta property="og:image:width" content="1132">
+    <meta property="og:image:height" content="636">
+    <meta property="og:image:alt" content="Bogdanoff making a phone call.">
+    <meta property="og:locale" content="en_US">
+    <!-- <meta property="fb:app_id" content="app_id"> -->
+
+    <!-- Twitter card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Bogged Again!">
+    <meta name="twitter:description" content="Bogged Again! is a python-based service that provides quantitative insight into the adage, 'Buy low, sell high.'">
+    <meta name="twitter:image" content="https://i.ytimg.com/vi/TRXdxiot5JM/maxresdefault.jpg">
+    <meta name="twitter:image:alt" content="Bogdanoff making a phone call.">
+    <!-- <meta name="twitter:site" content="@site_username"> -->
+
+    <!-- Raleway from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway:400,700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- Font Awesome Kit for Logos-->
+    <script src="https://kit.fontawesome.com/7906468088.js" crossorigin="anonymous"></script>
+
+    <!-- Block for any additional head content -->
+    {% block head_content %}
+    {% endblock head_content %}
+
+    <!-- Bogged Again Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
+
+    <!-- Suit man favicon accompanying title -->
+    <!-- https://fontawesome.com/icons/user-tie?style=solid -->
+    <link rel="shortcut icon" href="https://assets.change.org/photos/8/ac/aq/ouaCAQdZspeVZCl-800x800-noPad.jpg" type="image/x-icon">
+
+    <title>
+      {% block title %}
+      {{ page_title|default:"Untitled Page"}}
+      {% endblock title %}
+    </title>
+  </head>
+
+  {% block body_content %}
+  <body>
+    <p>Placeholder</p>
+  </body>
+  {% endblock body_content %}
+  
+</html>

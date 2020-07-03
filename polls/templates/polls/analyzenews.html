@@ -1,0 +1,108 @@
+{% extends 'polls/base.html' %}
+
+{% block head_content %}
+{% load static %}
+
+<!-- Tabulator Bootstrap CSS -->
+<link rel="stylesheet" href="{% static 'css/tabulator_bootstrap4.min.css' %}" type="text/css">
+
+<!-- Additional styling of analyzenews-table -->
+<style type="text/css">
+  /* Center header text of analyzenews-table */
+  .tabulator .tabulator-header .tabulator-col {
+    text-align:center;
+  }
+
+  /* Change selected row color */
+  .tabulator-row.tabulator-selected {
+    background-color: #eaa09a;
+  }
+  
+  .tabulator-row.tabulator-selected:hover {
+    background-color: #cc7c76;
+  }
+
+  .tabulator.table-striped .tabulator-row:nth-child(2n).tabulator-selected {
+    background-color: #eaa09a;
+  }
+
+  .tabulator.table-striped .tabulator-row:nth-child(2n).tabulator-selected:hover {
+    background-color: #cc7c76;
+  }
+</style>
+{% endblock head_content %}
+
+{% block title %}{{ title }}{% endblock title %}
+
+{% block body_content %}
+<body id="body-analyzenews">
+  <!-- Navbar at top of page -->
+  {% include 'polls/top_navbar.html' %}
+
+  <div class="container">
+    <!-- Main header of page -->
+    <h1 class="display-3 text-center my-5">{{ title }}</h1>
+
+    <!-- Buttons for deleting rows/resetting rows in analyzenews-table -->
+    <div class="btn-group-sm table-controls d-flex justify-content-center my-4" role="group" aria-label="Buttons to remove selected rows and reset table">
+      <button type="button" id="del-row" class="btn btn-outline-danger mr-1">
+        Remove Selected Rows
+      </button>
+
+      <button type="button" id="reset" class="btn btn-outline-success">
+        Reset
+      </button>
+    </div>
+
+    <!-- Table populated from analyzenews-table.js -->
+    <div id="analyzenews-table" class="table-sm table-striped table-bordered"></div>
+
+    <!-- Statistics summary table  -->
+    <h3 class="text-center mt-5 mb-4">Statistics Summary</h3>
+
+    <div class="table-responsive text-center mb-5">
+      <table class="table table-sm table-bordered">
+        <thead class="thead-light">
+          <tr>
+            {% for header in statheaders %}
+            <th scope="col">{{ header }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for item, column in stats %}
+            {% for val in column %}
+              {% cycle '<tr>' '' '' '' '' '' '' %}
+                <td>{{ val }}</td>
+              {% cycle '' '' '' '' '' '' '</tr>' %}
+            {% endfor %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap Scripts -->
+  {% include 'polls/bootstrap_scripts.html' %}
+  
+  {% load static %}
+
+  <!-- Script to enable/display top navbar ticker search -->
+  <script src="{% static 'js/enable_top_navbar_search.js' %}"></script>
+
+  <!-- Script for Tabulator -->
+  <script src="{% static 'js/tabulator.min.js' %}"></script>
+
+  <!-- Global variable for JSON object used in analyzenews-table.js -->
+  <script type="text/javascript">
+    // {% autoescape off %}
+      const tabledata = {{ json | safe }}
+    // {% endautoescape %}
+  </script>
+
+  <!-- Script to populate analyzenews-table -->
+  <script src="{% static 'js/analyzenews-table.js' %}"></script>
+  
+</body>
+{% endblock body_content %}

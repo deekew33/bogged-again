@@ -20,7 +20,7 @@ crochet==1.10.0
 cryptography==2.8
 cssselect==1.1.0
 cycler==0.10.0
-Django==2.1.15
+Django==2.2.24
 docutils==0.15.2
 future==0.16.0
 gast==0.2.2

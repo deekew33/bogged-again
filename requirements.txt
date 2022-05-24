@@ -84,7 +84,7 @@ tensorboard==2.0.2
 tensorflow==2.5.3
 tensorflow-docs==0.0.0
 tensorflow-estimator==2.0.1
-tensorflow-gpu==2.5.3
+tensorflow-gpu==2.6.4
 termcolor==1.1.0
 Twisted==22.2.0
 uritemplate==3.0.1
